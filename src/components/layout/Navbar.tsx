@@ -16,7 +16,8 @@ export default function Navbar() {
         <Link href='/' className='text-2xl font-bold text-brand-600'>TechVault</Link>
         <div className='hidden md:flex items-center gap-2 flex-1 max-w-lg mx-8'>
           <input placeholder='Search gadgets...'
-            className='w-full border border-gray-200 rounded-full px-5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500' />
+            className='w-full border border-gray-200 rounded-full px-5 py-2 text-sm
+              focus:outline-none focus:ring-2 focus:ring-brand-500' />
           <button className='bg-brand-500 text-white p-2 rounded-full hover:bg-brand-600'>
             <Search size={18} />
           </button>
