@@ -4,11 +4,15 @@ import { ShoppingCart, Heart, User, Search } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useUIStore }  from '@/store/uiStore';
 import { useAuthStore } from '@/store/authStore';
+import { useEffect, useState } from 'react';
 
 export default function Navbar() {
+   const [mounted, setMounted] = useState(false);
   const count    = useCartStore(s => s.getCount());
   const openCart = useUIStore(s => s.openCart);
   const user     = useAuthStore(s => s.user);
+
+    useEffect(() => setMounted(true), []);
 
   return (
     <nav className='sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm'>
@@ -26,7 +30,7 @@ export default function Navbar() {
           <Link href='/account/wishlist'><Heart size={22} className='text-gray-600 hover:text-brand-500' /></Link>
           <button onClick={openCart} className='relative'>
             <ShoppingCart size={22} className='text-gray-600 hover:text-brand-500' />
-            {count > 0 && <span className='absolute -top-2 -right-2 bg-brand-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center'>{count}</span>}
+           {mounted && count > 0 && <span className='absolute -top-2 -right-2 bg-brand-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center'>{count}</span>}
           </button>
           <Link href={user ? '/account' : '/auth/login'}>
             <User size={22} className='text-gray-600 hover:text-brand-500' />

@@ -18,17 +18,18 @@ export default function ProductCard({ product }: { product: any }) {
     toast.success('Added to cart!');
   };
 
-  const img = product.variants[0]?.images[0] || '/placeholder-product.png';
+  const img = product.variants[0]?.images[0] ?? null;
 
   return (
     <div className='bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group'>
       <Link href={`/products/${product.slug}`}>
         <div className='relative overflow-hidden rounded-t-2xl aspect-square bg-gray-50'>
-          <Image src={img} alt={product.name} fill className='object-cover group-hover:scale-105 transition-transform duration-300' />
-          {product.comparePrice && (
-            <span className='absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full'>
-              -{Math.round((1 - product.basePrice/product.comparePrice)*100)}%
-            </span>
+          {img ? (
+            <Image src={img} alt={product.name} fill className='object-cover group-hover:scale-105 transition-transform duration-300' />
+          ) : (
+            <div className='w-full h-full flex items-center justify-center text-gray-300 text-sm'>
+              No Image
+            </div>
           )}
         </div>
       </Link>
