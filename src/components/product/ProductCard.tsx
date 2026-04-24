@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link  from 'next/link';
-import { ShoppingCart, Star } from 'lucide-react';
+import { Heart, ShoppingCart, Star } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useUIStore }   from '@/store/uiStore';
 import toast from 'react-hot-toast';
