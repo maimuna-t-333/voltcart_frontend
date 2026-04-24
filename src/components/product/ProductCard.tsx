@@ -1,7 +1,8 @@
 'use client';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link  from 'next/link';
-import { Heart, ShoppingCart, Star } from 'lucide-react';
+import { ShoppingCart, Star } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useUIStore }   from '@/store/uiStore';
 import toast from 'react-hot-toast';
@@ -13,7 +14,7 @@ export default function ProductCard({ product }: { product: any }) {
   const handleAddToCart = () => {
     const v = product.variants[0];
     addItem({ productId: product._id, variantSku: v.sku, name: product.name,
-              image: v.images[0] || '/placeholder.png', price: v.price, quantity: 1 });
+              image: v.images[0] || '', price: v.price, quantity: 1 });
     openCart();
     toast.success('Added to cart!');
   };
@@ -21,7 +22,12 @@ export default function ProductCard({ product }: { product: any }) {
   const img = product.variants[0]?.images[0] ?? null;
 
   return (
-    <div className='bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group'>
+    <motion.div
+      whileHover={{ y: -6, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      className='bg-white rounded-2xl border border-gray-100 shadow-sm group'
+    >
       <Link href={`/products/${product.slug}`}>
         <div className='relative overflow-hidden rounded-t-2xl aspect-square bg-gray-50'>
           {img ? (
@@ -31,11 +37,18 @@ export default function ProductCard({ product }: { product: any }) {
               No Image
             </div>
           )}
+          {product.comparePrice && (
+            <span className='absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full'>
+              -{Math.round((1 - product.basePrice/product.comparePrice)*100)}%
+            </span>
+          )}
         </div>
       </Link>
       <div className='p-4'>
         <p className='text-xs text-brand-500 font-medium mb-1'>{product.brand}</p>
-        <Link href={`/products/${product.slug}`}><h3 className='font-semibold text-gray-800 text-sm line-clamp-2 hover:text-brand-600'>{product.name}</h3></Link>
+        <Link href={`/products/${product.slug}`}>
+          <h3 className='font-semibold text-gray-800 text-sm line-clamp-2 hover:text-brand-600'>{product.name}</h3>
+        </Link>
         <div className='flex items-center gap-1 mt-2'>
           <Star size={14} className='fill-yellow-400 text-yellow-400' />
           <span className='text-xs text-gray-600'>{product.avgRating.toFixed(1)} ({product.reviewCount})</span>
@@ -50,6 +63,6 @@ export default function ProductCard({ product }: { product: any }) {
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
