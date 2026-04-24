@@ -10,15 +10,22 @@ export default function CartDrawer() {
 
   return (
     <>
+      {/* Backdrop */}
       {isCartOpen && <div className='fixed inset-0 bg-black/40 z-40' onClick={closeCart} />}
+
+      {/* Drawer */}
       <div className={`fixed right-0 top-0 h-full w-full max-w-md bg-white z-50 shadow-2xl
         flex flex-col transition-transform duration-300 ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+
+        {/* Header */}
         <div className='flex items-center justify-between p-5 border-b'>
           <h2 className='font-bold text-xl flex items-center gap-2'>
             <ShoppingCart size={20} /> Cart ({items.length})
           </h2>
           <button onClick={closeCart} className='p-2 hover:bg-gray-100 rounded-full'><X size={20}/></button>
         </div>
+
+        {/* Items */}
         <div className='flex-1 overflow-y-auto p-5 space-y-4'>
           {items.length === 0 ? (
             <div className='text-center py-16 text-gray-400'>
@@ -41,6 +48,8 @@ export default function CartDrawer() {
             </div>
           ))}
         </div>
+
+        {/* Footer */}
         {items.length > 0 && (
           <div className='p-5 border-t'>
             <div className='flex justify-between mb-4 font-bold text-lg'>
