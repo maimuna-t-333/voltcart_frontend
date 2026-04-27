@@ -5,6 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import CartDrawer from '@/components/layout/CartDrawer';
 import ChatWidget from '@/components/layout/ChatWidget';
 import './globals.css';
+import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
   title: 'TechVault',
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main>{children}</main>
             <CartDrawer />
             <ChatWidget />
+              <Footer /> 
           </AuthProvider>
         </Providers>
       </body>
