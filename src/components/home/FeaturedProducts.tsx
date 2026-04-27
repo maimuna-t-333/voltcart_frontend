@@ -59,5 +59,6 @@ export default function FeaturedProducts() {
         </motion.div>
       )}
     </section>
+    
   );
 }
