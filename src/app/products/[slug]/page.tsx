@@ -1,4 +1,5 @@
 'use client';
+import { useProducts } from '@/hooks/useProducts';
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
@@ -14,6 +15,25 @@ import { ProductCardSkeleton } from '@/components/ui/Skeleton';
 import PageTransition from '@/components/layout/PageTransition';
 import toast from 'react-hot-toast';
 import { formatPrice } from '@/lib/utils';
+import ProductCard from '@/components/product/ProductCard';
+
+function RelatedProducts({ category, currentSlug }: { category: string, currentSlug: string }) {
+  const { data } = useProducts({ category, limit: 4 });
+  const related = data?.products.filter(p => p.slug !== currentSlug) || [];
+
+  if (related.length === 0) return null;
+
+  return (
+    <div className='max-w-7xl mx-auto px-4 py-12 border-t border-gray-100'>
+      <h2 className='text-2xl font-bold text-gray-900 mb-6'>Related Products</h2>
+      <div className='grid grid-cols-2 md:grid-cols-4 gap-5'>
+        {related.map(product => (
+          <ProductCard key={product._id} product={product} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -93,7 +113,7 @@ export default function ProductDetailPage() {
               animate={{ opacity: 1, scale: 1 }}
             >
               {images[selectedImage] ? (
-                <Image src={images[selectedImage]!} alt={product.name} fill className='object-cover' />
+                <Image src={images[selectedImage]!} alt={product.name} fill fill sizes='(max-width: 768px) 100vw, className='object-cover' />
               ) : (
                 <div className='w-full h-full flex items-center justify-center text-gray-300 text-6xl'>
                   📦
@@ -234,6 +254,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+      <RelatedProducts category={product.category} currentSlug={product.slug} />
     </PageTransition>
   );
 }

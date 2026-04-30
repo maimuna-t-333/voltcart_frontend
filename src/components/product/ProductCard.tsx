@@ -31,7 +31,11 @@ export default function ProductCard({ product }: { product: any }) {
       <Link href={`/products/${product.slug}`}>
         <div className='relative overflow-hidden rounded-t-2xl aspect-square bg-gray-50'>
           {img ? (
-            <Image src={img} alt={product.name} fill className='object-cover group-hover:scale-105 transition-transform duration-300' />
+            <Image src={img}
+            alt={product.name} 
+            fill  
+            sizes='(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw' 
+            className='object-cover group-hover:scale-105 transition-transform duration-300' />
           ) : (
             <div className='w-full h-full flex items-center justify-center text-gray-300 text-sm'>
               No Image
