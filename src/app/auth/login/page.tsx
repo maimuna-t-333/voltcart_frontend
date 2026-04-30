@@ -5,32 +5,31 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, ShoppingBag } from 'lucide-react';
 import api from '@/lib/axios';
-import { useAuthStore } from '@/store/authStore';
 import toast from 'react-hot-toast';
 import PageTransition from '@/components/layout/PageTransition';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
   const router = useRouter();
-  const setAuth = useAuthStore(s => s.setAuth);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { data } = await api.post('/auth/login', { email, password });
-      setAuth(data.data.user, data.data.accessToken);
-      toast.success(`Welcome back, ${data.data.user.name}!`);
-      router.push('/');
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  try {
+    await login(email, password);
+    router.push('/');
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || 'Login failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <PageTransition>

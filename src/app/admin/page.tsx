@@ -9,15 +9,11 @@ import PageTransition from '@/components/layout/PageTransition';
 import api from '@/lib/axios';
 import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
+import { useRequireAdmin } from '@/hooks/useAuth';
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const user = useAuthStore(s => s.user);
-
-  useEffect(() => {
-    if (!user) router.push('/auth/login');
-    else if (user.role !== 'admin') router.push('/');
-  }, [user]);
+const { user } = useRequireAdmin();
 
   const { data: products } = useQuery({
     queryKey: ['admin', 'products'],

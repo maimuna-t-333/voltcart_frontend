@@ -3,28 +3,24 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { User, ShoppingBag, Heart, LogOut, Settings, ChevronRight } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
 import PageTransition from '@/components/layout/PageTransition';
 import Link from 'next/link';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function AccountPage() {
   const router = useRouter();
-  const { user, clearAuth } = useAuthStore();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     if (!user) router.push('/auth/login');
   }, [user]);
 
-  const handleLogout = async () => {
-    try {
-      await api.post('/auth/logout');
-    } catch {}
-    clearAuth();
-    toast.success('Logged out successfully');
-    router.push('/');
-  };
+ const handleLogout = async () => {
+  await logout();
+  router.push('/');
+};
 
   if (!user) return null;
 

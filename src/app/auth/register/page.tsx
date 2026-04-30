@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, User, ShoppingBag } from 'lucide-react';
 import api from '@/lib/axios';
-import { useAuthStore } from '@/store/authStore';
 import toast from 'react-hot-toast';
 import PageTransition from '@/components/layout/PageTransition';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const setAuth = useAuthStore(s => s.setAuth);
+  const { register } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,23 +19,21 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password.length < 8) {
-      toast.error('Password must be at least 8 characters');
-      return;
-    }
-    setLoading(true);
-    try {
-      const { data } = await api.post('/auth/register', { name, email, password });
-      setAuth(data.data.user, data.data.accessToken);
-      toast.success('Account created successfully!');
-      router.push('/');
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Registration failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+  if (password.length < 8) {
+    toast.error('Password must be at least 8 characters');
+    return;
+  }
+  setLoading(true);
+  try {
+    await register(name, email, password);
+    router.push('/');
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || 'Registration failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <PageTransition>
