@@ -73,7 +73,11 @@ export default function CartPage() {
                   className='bg-white border border-gray-100 rounded-2xl p-5 flex gap-5 shadow-sm'
                 >
                   <div className='w-24 h-24 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0 text-4xl'>
-                    {item.image ? <img src={item.image} alt={item.name} className='w-full h-full object-cover rounded-xl' /> : '📦'}
+                    {item.image ? (
+  <img src={item.image} className='w-24 h-24 rounded-xl object-cover'/>
+) : (
+  <div className='w-24 h-24 bg-gray-50 rounded-xl flex items-center justify-center text-4xl'>📦</div>
+)}
                   </div>
                   <div className='flex-1'>
                     <h3 className='font-semibold text-gray-900'>{item.name}</h3>

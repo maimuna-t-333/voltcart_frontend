@@ -113,7 +113,7 @@ export default function ProductDetailPage() {
               animate={{ opacity: 1, scale: 1 }}
             >
               {images[selectedImage] ? (
-                <Image src={images[selectedImage]!} alt={product.name} fill fill sizes='(max-width: 768px) 100vw, className='object-cover' />
+                <Image src={images[selectedImage]!} alt={product.name} fill sizes='(max-width: 768px) 100vw, 50vw' className='object-cover' />
               ) : (
                 <div className='w-full h-full flex items-center justify-center text-gray-300 text-6xl'>
                   📦
