@@ -44,21 +44,33 @@ export default function CheckoutPage() {
   const nextStep = () => { setDir(1); setStep(s => Math.min(s + 1, 4)); };
   const prevStep = () => { setDir(-1); setStep(s => Math.max(s - 1, 1)); };
 
-  const handlePayment = async () => {
-    setLoading(true);
-    try {
-      const { data } = await api.post('/payments/intent', { shippingMethod });
-      if (data.data.clientSecret) {
-        toast.success('Order placed! Redirecting...');
-        clearCart();
-        router.push(`/order-confirmation?orderId=${data.data.orderId}`);
-      }
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Payment failed. Please try again.');
-    } finally {
-      setLoading(false);
+ const handlePayment = async () => {
+  setLoading(true);
+  try {
+    const { data } = await api.post('/payments/intent', {
+      shippingMethod,
+      items: items.map(item => ({
+        productId: item.productId,
+        variantSku: item.variantSku,
+        quantity: item.quantity,
+        price: item.price,
+        name: item.name,
+      })),
+      subtotal,
+      discount,
+      couponCode,
+    });
+    if (data.data.clientSecret) {
+      toast.success('Order placed! Redirecting...');
+      clearCart();
+      router.push(`/order-confirmation?orderId=${data.data.orderId}`);
     }
-  };
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || 'Payment failed. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (items.length === 0) return (
     <div className='text-center py-20'>
