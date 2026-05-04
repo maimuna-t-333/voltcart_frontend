@@ -44,7 +44,7 @@ export default function CheckoutPage() {
   const nextStep = () => { setDir(1); setStep(s => Math.min(s + 1, 4)); };
   const prevStep = () => { setDir(-1); setStep(s => Math.max(s - 1, 1)); };
 
- const handlePayment = async () => {
+const handlePayment = async () => {
   setLoading(true);
   try {
     const { data } = await api.post('/payments/intent', {
