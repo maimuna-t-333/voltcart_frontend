@@ -26,7 +26,7 @@ export default function AdminProductsPage() {
     queryKey: ['admin', 'products', search],
     queryFn: async () => {
       const params = search ? `?search=${search}` : '';
-      const { data } = await api.get(`/products${params}&limit=50`);
+      const { data } = await api.get(`/products?limit=50${search ? `&search=${search}` : ''}`);
       return data.data;
     },
   });
