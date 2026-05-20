@@ -1,5 +1,4 @@
 'use client';
-import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -8,20 +7,6 @@ import { motion } from 'framer-motion';
 import { DollarSign } from 'lucide-react';
 import api from '@/lib/axios';
 import { formatPrice } from '@/lib/utils';
-
-function formatMonth(dateStr: string) {
-  const d = new Date(dateStr);
-  return d.toLocaleString('en-US', { month: 'short', year: '2-digit' });
-}
-
-function aggregateByMonth(orders: { createdAt: string; total: number }[]) {
-  const map = new Map<string, number>();
-  for (const o of orders) {
-    const key = formatMonth(o.createdAt);
-    map.set(key, (map.get(key) || 0) + o.total);
-  }
-  return Array.from(map, ([month, revenue]) => ({ month, revenue }));
-}
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -35,17 +20,19 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function RevenueChart() {
   const { data, isLoading } = useQuery({
-    queryKey: ['admin', 'orders', 'all'],
+    queryKey: ['admin', 'revenue-trends'],
     queryFn: async () => {
-      const { data } = await api.get('/orders?limit=500&sort=oldest');
+      const { data } = await api.get('/admin/dashboard/revenue?period=day');
       return data.data;
     },
   });
 
-  const chartData = useMemo(
-    () => (data?.orders ? aggregateByMonth(data.orders) : []),
-    [data],
-  );
+  // Format date labels nicely
+  const chartData = (data?.trends ?? []).map((t: { date: string; revenue: number; orders: number }) => ({
+    date: new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    revenue: t.revenue,
+    orders: t.orders,
+  }));
 
   return (
     <motion.div
@@ -61,21 +48,21 @@ export default function RevenueChart() {
           </div>
           <div>
             <h2 className='font-bold text-gray-900'>Revenue Overview</h2>
-            <p className='text-sm text-gray-500'>Monthly revenue trend</p>
+            <p className='text-sm text-gray-500'>Last 30 days daily revenue</p>
           </div>
         </div>
       </div>
 
       {isLoading ? (
         <div className='h-72 flex items-center justify-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500' />
+          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500' />
         </div>
       ) : chartData.length === 0 ? (
         <div className='h-72 flex items-center justify-center text-gray-400 text-sm'>
-          No order data available yet
+          No revenue data available yet
         </div>
       ) : (
-        <div className='h-72'>
+        <div style={{ width: '100%', height: 288 }}>
           <ResponsiveContainer width='100%' height='100%'>
             <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <defs>
@@ -85,26 +72,10 @@ export default function RevenueChart() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray='3 3' stroke='#f1f5f9' />
-              <XAxis
-                dataKey='month'
-                tick={{ fontSize: 12, fill: '#94a3b8' }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 12, fill: '#94a3b8' }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={v => `$${(v / 1000).toFixed(0)}k`}
-              />
+              <XAxis dataKey='date' tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
               <Tooltip content={<CustomTooltip />} />
-              <Area
-                type='monotone'
-                dataKey='revenue'
-                stroke='#22c55e'
-                strokeWidth={2}
-                fill='url(#revenueGradient)'
-              />
+              <Area type='monotone' dataKey='revenue' stroke='#22c55e' strokeWidth={2} fill='url(#revenueGradient)' />
             </AreaChart>
           </ResponsiveContainer>
         </div>
