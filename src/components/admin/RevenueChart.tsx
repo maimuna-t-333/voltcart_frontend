@@ -1,12 +1,14 @@
 'use client';
+import dynamic from 'next/dynamic';
 import { useQuery } from '@tanstack/react-query';
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-} from 'recharts';
 import { motion } from 'framer-motion';
 import { DollarSign } from 'lucide-react';
 import api from '@/lib/axios';
 import { formatPrice } from '@/lib/utils';
+
+
+interface TrendPoint { date: string; revenue: number; orders: number }
+interface ChartPoint { date: string; revenue: number; orders: number }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -18,6 +20,33 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
+function ChartInner({ chartData }: { chartData: ChartPoint[] }) {
+  const {
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  } = require('recharts');
+
+  return (
+    <ResponsiveContainer width='100%' height={288}>
+      <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+        <defs>
+          <linearGradient id='revenueGradient' x1='0' y1='0' x2='0' y2='1'>
+            <stop offset='0%' stopColor='#22c55e' stopOpacity={0.3} />
+            <stop offset='100%' stopColor='#22c55e' stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray='3 3' stroke='#f1f5f9' />
+        <XAxis dataKey='date' tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+        <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false}
+          tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`} />
+        <Tooltip content={<CustomTooltip />} />
+        <Area type='monotone' dataKey='revenue' stroke='#22c55e' strokeWidth={2} fill='url(#revenueGradient)' />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+}
+
+const ClientChart = dynamic(() => Promise.resolve(ChartInner), { ssr: false });
+
 export default function RevenueChart() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'revenue-trends'],
@@ -27,8 +56,7 @@ export default function RevenueChart() {
     },
   });
 
-  // Format date labels nicely
-  const chartData = (data?.trends ?? []).map((t: { date: string; revenue: number; orders: number }) => ({
+  const chartData: ChartPoint[] = (data?.trends ?? []).map((t: TrendPoint) => ({
     date: new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     revenue: t.revenue,
     orders: t.orders,
@@ -53,33 +81,19 @@ export default function RevenueChart() {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className='h-72 flex items-center justify-center'>
-          <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500' />
-        </div>
-      ) : chartData.length === 0 ? (
-        <div className='h-72 flex items-center justify-center text-gray-400 text-sm'>
-          No revenue data available yet
-        </div>
-      ) : (
-        <div style={{ width: '100%', height: 288 }}>
-          <ResponsiveContainer width='100%' height='100%'>
-            <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id='revenueGradient' x1='0' y1='0' x2='0' y2='1'>
-                  <stop offset='0%' stopColor='#22c55e' stopOpacity={0.3} />
-                  <stop offset='100%' stopColor='#22c55e' stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray='3 3' stroke='#f1f5f9' />
-              <XAxis dataKey='date' tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
-              <Tooltip content={<CustomTooltip />} />
-              <Area type='monotone' dataKey='revenue' stroke='#22c55e' strokeWidth={2} fill='url(#revenueGradient)' />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      )}
+      <div className='h-72'>
+        {isLoading ? (
+          <div className='h-full flex items-center justify-center'>
+            <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500' />
+          </div>
+        ) : chartData.length === 0 ? (
+          <div className='h-full flex items-center justify-center text-gray-400 text-sm'>
+            No revenue data available yet
+          </div>
+        ) : (
+          <ClientChart chartData={chartData} />
+        )}
+      </div>
     </motion.div>
   );
 }
