@@ -12,7 +12,7 @@ export default function AdminCustomersPage() {
   const { user } = useRequireAdmin();
   const [search, setSearch] = useState('');
   const [page, setPage]     = useState(1);
-  const [q, setQ]           = useState('');   // committed search term
+  const [q, setQ]           = useState('');  
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'customers', q, page],
