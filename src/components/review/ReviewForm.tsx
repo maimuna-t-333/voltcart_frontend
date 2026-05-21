@@ -7,12 +7,12 @@ import StarRating from './StarRating';
 import toast from 'react-hot-toast';
 
 interface ReviewFormProps {
-  productId: string;
+  slug: string;
 }
 
-export default function ReviewForm({ productId }: ReviewFormProps) {
+export default function ReviewForm({ slug }: ReviewFormProps) {
   const user = useAuthStore(s => s.user);
-  const submit = useSubmitReview(productId);
+  const submit = useSubmitReview(slug);
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState('');
   const [comment, setComment] = useState('');
@@ -45,7 +45,8 @@ export default function ReviewForm({ productId }: ReviewFormProps) {
           setTitle('');
           setComment('');
         },
-        onError: () => {
+        onError: (err) => {
+          console.error('Review submit error:', err);
           toast.error('Failed to submit review');
         },
       }

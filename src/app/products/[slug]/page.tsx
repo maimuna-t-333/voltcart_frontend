@@ -56,8 +56,7 @@ export default function ProductDetailPage() {
     },
   });
 
-  const productId = product?._id ?? '';
-  const { data: reviews = [], isLoading: reviewsLoading } = useReviews(productId);
+  const { data: reviews = [], isLoading: reviewsLoading } = useReviews(slug as string);
 
   if (isLoading) return (
     <div className='max-w-7xl mx-auto px-4 py-8'>
@@ -259,7 +258,7 @@ export default function ProductDetailPage() {
             ) : (
               <div className='space-y-8'>
                 <ReviewList reviews={reviews} isLoading={reviewsLoading} />
-                <ReviewForm productId={productId} />
+                <ReviewForm slug={slug as string} />
               </div>
             )}
           </div>
