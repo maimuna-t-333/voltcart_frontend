@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, Lock, ShoppingBag } from 'lucide-react';
-import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 import PageTransition from '@/components/layout/PageTransition';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,7 +15,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-
 
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -45,7 +43,7 @@ export default function LoginPage() {
               <ShoppingBag size={28} className='text-white' />
             </div>
             <h1 className='text-2xl font-bold text-gray-900'>Welcome back</h1>
-            <p className='text-gray-500 mt-1'>Sign in to your TechVault account</p>
+            <p className='text-gray-500 mt-1'>Sign in to your VoltCart account</p>
           </div>
 
           <form onSubmit={handleSubmit} className='space-y-5'>
