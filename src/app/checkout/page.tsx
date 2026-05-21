@@ -28,23 +28,19 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, getTotal, discount, couponCode, clearCart } = useCartStore();
   const user = useAuthStore(s => s.user);
-
   const [step, setStep] = useState(1);
   const [dir, setDir] = useState(1);
   const [loading, setLoading] = useState(false);
-
   const [contact, setContact] = useState({ name: user?.name || '', email: user?.email || '', phone: '' });
   const [shipping, setShipping] = useState({ address: '', city: '', state: '', zip: '', country: 'US' });
   const [shippingMethod, setShippingMethod] = useState('standard');
-
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const shippingCost = { standard: 5.99, express: 12.99, overnight: 24.99 }[shippingMethod] || 5.99;
   const total = subtotal - discount + (subtotal > 50 ? 0 : shippingCost);
-
   const nextStep = () => { setDir(1); setStep(s => Math.min(s + 1, 4)); };
   const prevStep = () => { setDir(-1); setStep(s => Math.max(s - 1, 1)); };
 
-const handlePayment = async () => {
+  const handlePayment = async () => {
   setLoading(true);
   try {
     const { data } = await api.post('/payments/intent', {
@@ -59,6 +55,13 @@ const handlePayment = async () => {
       subtotal,
       discount,
       couponCode,
+      shippingAddress: {      
+        line1: shipping.address,
+        city: shipping.city,
+        state: shipping.state,
+        zip: shipping.zip,
+        country: shipping.country,
+      },
     });
     if (data.data.clientSecret) {
       toast.success('Order placed! Redirecting...');
