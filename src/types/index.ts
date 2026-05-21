@@ -43,6 +43,15 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface Review {
+  _id: string;
+  user: { _id: string; name: string };
+  rating: number;
+  title: string;
+  comment: string;
+  createdAt: string;
+}
+
 export interface Order {
   _id: string;
   status: string;

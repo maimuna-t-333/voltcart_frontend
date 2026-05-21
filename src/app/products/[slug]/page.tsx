@@ -16,6 +16,9 @@ import PageTransition from '@/components/layout/PageTransition';
 import toast from 'react-hot-toast';
 import { formatPrice } from '@/lib/utils';
 import ProductCard from '@/components/product/ProductCard';
+import { useReviews } from '@/hooks/useReviews';
+import ReviewList from '@/components/review/ReviewList';
+import ReviewForm from '@/components/review/ReviewForm';
 
 function RelatedProducts({ category, currentSlug }: { category: string, currentSlug: string }) {
   const { data } = useProducts({ category, limit: 4 });
@@ -40,7 +43,7 @@ export default function ProductDetailPage() {
   const router = useRouter();
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [activeTab, setActiveTab] = useState<'specs' | 'description'>('description');
+  const [activeTab, setActiveTab] = useState<'specs' | 'description' | 'reviews'>('description');
 
   const addItem = useCartStore(s => s.addItem);
   const openCart = useUIStore(s => s.openCart);
@@ -52,6 +55,9 @@ export default function ProductDetailPage() {
       return data.data.product;
     },
   });
+
+  const productId = product?._id ?? '';
+  const { data: reviews = [], isLoading: reviewsLoading } = useReviews(productId);
 
   if (isLoading) return (
     <div className='max-w-7xl mx-auto px-4 py-8'>
@@ -227,7 +233,7 @@ export default function ProductDetailPage() {
             {/* Tabs */}
             <div className='border-b border-gray-200 mb-4'>
               <div className='flex gap-6'>
-                {(['description', 'specs'] as const).map(tab => (
+                {(['description', 'specs', 'reviews'] as const).map(tab => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -241,7 +247,7 @@ export default function ProductDetailPage() {
 
             {activeTab === 'description' ? (
               <p className='text-gray-600 leading-relaxed'>{product.description}</p>
-            ) : (
+            ) : activeTab === 'specs' ? (
               <div className='space-y-2'>
                 {product.specs.map(spec => (
                   <div key={spec.key} className='flex justify-between py-2 border-b border-gray-100'>
@@ -249,6 +255,11 @@ export default function ProductDetailPage() {
                     <span className='text-gray-900 text-sm font-medium'>{spec.value}</span>
                   </div>
                 ))}
+              </div>
+            ) : (
+              <div className='space-y-8'>
+                <ReviewList reviews={reviews} isLoading={reviewsLoading} />
+                <ReviewForm productId={productId} />
               </div>
             )}
           </div>
