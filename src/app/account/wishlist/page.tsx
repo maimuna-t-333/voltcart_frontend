@@ -1,34 +1,18 @@
 'use client';
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useUIStore } from '@/store/uiStore';
+import { useWishlistStore, type WishlistItem } from '@/store/wishlistStore';
 import { formatPrice } from '@/lib/utils';
 import PageTransition from '@/components/layout/PageTransition';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
-interface WishlistItem {
-  _id: string;
-  name: string;
-  brand: string;
-  slug: string;
-  basePrice: number;
-  comparePrice?: number;
-  image: string;
-  variantSku: string;
-}
-
 export default function WishlistPage() {
-  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+  const { items: wishlist, removeFromWishlist } = useWishlistStore();
   const addItem = useCartStore(s => s.addItem);
   const openCart = useUIStore(s => s.openCart);
-
-  const removeFromWishlist = (id: string) => {
-    setWishlist(w => w.filter(item => item._id !== id));
-    toast.success('Removed from wishlist');
-  };
 
   const addToCart = (item: WishlistItem) => {
     addItem({

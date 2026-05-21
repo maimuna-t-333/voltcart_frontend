@@ -2,14 +2,19 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link  from 'next/link';
-import { ShoppingCart, Star } from 'lucide-react';
+import { Heart, ShoppingCart, Star } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useUIStore }   from '@/store/uiStore';
+import { useWishlistStore } from '@/store/wishlistStore';
+import {useAuthStore} from '@/store/authStore';
 import toast from 'react-hot-toast';
 
 export default function ProductCard({ product }: { product: any }) {
   const addItem  = useCartStore(s => s.addItem);
   const openCart = useUIStore(s => s.openCart);
+  const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const user = useAuthStore(s => s.user);
+  const wishlisted = isInWishlist(product._id);
 
   const handleAddToCart = () => {
     const v = product.variants[0];
@@ -17,6 +22,26 @@ export default function ProductCard({ product }: { product: any }) {
               image: v.images[0] || '', price: v.price, quantity: 1 });
     openCart();
     toast.success('Added to cart!');
+  };
+
+  const handleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error('Please log in to save items');
+      return;
+    }
+  
+    const v = product.variants[0];
+    toggleWishlist({
+      _id:          product._id,
+      name:         product.name,
+      brand:        product.brand,
+      slug:         product.slug,
+      basePrice:    product.basePrice,
+      comparePrice: product.comparePrice,
+      variantSku:   v?.sku ?? '',
+      image:        v?.images[0] ?? '',
+    });
   };
 
   const img = product.variants[0]?.images[0] ?? null;
@@ -46,6 +71,20 @@ export default function ProductCard({ product }: { product: any }) {
               -{Math.round((1 - product.basePrice/product.comparePrice)*100)}%
             </span>
           )}
+          <button
+            onClick={handleWishlist}
+            className={`
+              absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center
+              shadow-md transition-all duration-200
+              opacity-0 group-hover:opacity-100
+              ${wishlisted
+                ? 'bg-red-500 text-white'
+                : 'bg-white text-gray-400 hover:text-red-400'}
+            `}
+            aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          >
+            <Heart size={15} className={wishlisted ? 'fill-white' : ''} />
+          </button>
         </div>
       </Link>
       <div className='p-4'>

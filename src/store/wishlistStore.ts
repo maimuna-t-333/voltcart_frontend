@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import api from '@/lib/axios';
+import toast from 'react-hot-toast';
 
-interface WishlistItem {
+export interface WishlistItem {
   _id: string;
   name: string;
   brand: string;
@@ -66,8 +67,10 @@ export const useWishlistStore = create<WishlistStore>()(
         try {
           if (already) {
             await api.delete(`/users/wishlist/${product._id}`);
+            toast.success('Removed from wishlist');
           } else {
             await api.post(`/users/wishlist/${product._id}`);
+            toast.success('Saved to wishlist!');
           }
         } catch {
           if (already) {
@@ -75,6 +78,7 @@ export const useWishlistStore = create<WishlistStore>()(
           } else {
             set((s) => ({ items: s.items.filter((i) => i._id !== product._id) }));
           }
+          toast.error('Failed to update wishlist. Please try again.');
         }
       },
 
