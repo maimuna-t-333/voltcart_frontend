@@ -10,6 +10,9 @@ import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 import { Check, CreditCard, MapPin, Truck, User } from 'lucide-react';
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {contactSchema, type ContactFormData, shippingSchema, type ShippingFormData} from '@/lib/validations/checkout.schemas';
 
 const variants = {
   enter: (d: number) => ({ x: d > 0 ? 300 : -300, opacity: 0 }),
@@ -26,19 +29,50 @@ const steps = [
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, getTotal, discount, couponCode, clearCart } = useCartStore();
-  const user = useAuthStore(s => s.user);
+  const { items, discount, couponCode, clearCart } = useCartStore();
   const [step, setStep] = useState(1);
   const [dir, setDir] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [contact, setContact] = useState({ name: user?.name || '', email: user?.email || '', phone: '' });
-  const [shipping, setShipping] = useState({ address: '', city: '', state: '', zip: '', country: 'US' });
   const [shippingMethod, setShippingMethod] = useState('standard');
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const shippingCost = { standard: 5.99, express: 12.99, overnight: 24.99 }[shippingMethod] || 5.99;
   const total = subtotal - discount + (subtotal > 50 ? 0 : shippingCost);
-  const nextStep = () => { setDir(1); setStep(s => Math.min(s + 1, 4)); };
-  const prevStep = () => { setDir(-1); setStep(s => Math.max(s - 1, 1)); };
+  const prevStep = () => { setDir(-1); setStep(s => Math.max(s - 1, 1))};
+  const user = useAuthStore(s => s.user);
+
+  const {register: registerContact, 
+    handleSubmit: handleContact, 
+    formState: { errors: contactErrors }} = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+    name:  user?.name  || '',
+    email: user?.email || '',
+    phone: '',
+  },
+  });
+
+  const {
+  register: registerShipping,
+  handleSubmit: handleShipping,
+  getValues: getShippingValues,  
+  formState: { errors: shippingErrors }} = useForm<ShippingFormData>({
+  resolver: zodResolver(shippingSchema),
+  defaultValues: {
+    address: '', city: '', state: '', zip: '', country: 'US',
+  },
+});
+
+const onContactSubmit = (data: ContactFormData) => {
+  setDir(1);
+  setStep(2);
+};
+
+const onShippingSubmit = (data: ShippingFormData) => {
+  setDir(1);
+  setStep(3);
+};
+
+const nextStep = () => { setDir(1); setStep(s => Math.min(s + 1, 4)); };
 
   const handlePayment = async () => {
   setLoading(true);
@@ -55,13 +89,13 @@ export default function CheckoutPage() {
       subtotal,
       discount,
       couponCode,
-      shippingAddress: {      
-        line1: shipping.address,
-        city: shipping.city,
-        state: shipping.state,
-        zip: shipping.zip,
-        country: shipping.country,
-      },
+      shippingAddress: {
+        line1: getShippingValues('address'),
+        city: getShippingValues('city'),
+        state: getShippingValues('state'),
+        zip: getShippingValues('zip'),
+        country: getShippingValues('country'),
+      }
     });
     if (data.data.clientSecret) {
       toast.success('Order placed! Redirecting...');
@@ -124,79 +158,149 @@ export default function CheckoutPage() {
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 className='bg-white border border-gray-100 rounded-2xl p-6 shadow-sm'
               >
-                {/* Step 1 — Contact */}
-                {step === 1 && (
-                  <div className='space-y-4'>
-                    <h2 className='text-lg font-bold text-gray-900 mb-6'>Contact Information</h2>
+              {step === 1 && (
+
+                <form onSubmit={handleContact(onContactSubmit)} className='space-y-4'>
+                  <h2 className='text-lg font-bold text-gray-900 mb-6'>Contact Information</h2>
+
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>Full Name</label>
+                    <input
+                      {...registerContact('name')}
+                      className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm
+                        ${contactErrors.name ? 'border-red-400' : 'border-gray-200'}`}
+                      placeholder='John Doe'
+                    />
+                    {contactErrors.name && (
+                      <p className='text-red-500 text-xs mt-1'>{contactErrors.name.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>Email</label>
+                    <input
+                      {...registerContact('email')}
+                      type='email'
+                      className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm
+                        ${contactErrors.email ? 'border-red-400' : 'border-gray-200'}`}
+                      placeholder='john@example.com'
+                    />
+                    {contactErrors.email && (
+                      <p className='text-red-500 text-xs mt-1'>{contactErrors.email.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>Phone</label>
+                    <input
+                      {...registerContact('phone')}
+                      className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm
+                        ${contactErrors.phone ? 'border-red-400' : 'border-gray-200'}`}
+                      placeholder='+1 234 567 8900'
+                    />
+                    {contactErrors.phone && (
+                      <p className='text-red-500 text-xs mt-1'>{contactErrors.phone.message}</p>
+                    )}
+                  </div>
+
+                  <button
+                    type='submit'
+                    className='w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-colors mt-4'
+                  >
+                    Continue to Shipping
+                  </button>
+                </form>
+              )}
+
+                
+              {step === 2 && (
+                <form onSubmit={handleShipping(onShippingSubmit)} className='space-y-4'>
+                  <h2 className='text-lg font-bold text-gray-900 mb-6'>Shipping Address</h2>
+
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>Street Address</label>
+                    <input
+                      {...registerShipping('address')}
+                      className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm
+                        ${shippingErrors.address ? 'border-red-400' : 'border-gray-200'}`}
+                      placeholder='123 Main St'
+                    />
+                    {shippingErrors.address && (
+                      <p className='text-red-500 text-xs mt-1'>{shippingErrors.address.message}</p>
+                    )}
+                  </div>
+
+                  <div className='grid grid-cols-2 gap-4'>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-2'>Full Name</label>
-                      <input value={contact.name} onChange={e => setContact({...contact, name: e.target.value})}
-                        className='w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm' placeholder='John Doe' />
+                      <label className='block text-sm font-medium text-gray-700 mb-2'>City</label>
+                      <input
+                        {...registerShipping('city')}
+                        className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm
+                          ${shippingErrors.city ? 'border-red-400' : 'border-gray-200'}`}
+                        placeholder='New York'
+                      />
+                      {shippingErrors.city && (
+                        <p className='text-red-500 text-xs mt-1'>{shippingErrors.city.message}</p>
+                      )}
                     </div>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-2'>Email</label>
-                      <input type='email' value={contact.email} onChange={e => setContact({...contact, email: e.target.value})}
-                        className='w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm' placeholder='john@example.com' />
+                      <label className='block text-sm font-medium text-gray-700 mb-2'>ZIP Code</label>
+                      <input
+                        {...registerShipping('zip')}
+                        className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm
+                          ${shippingErrors.zip ? 'border-red-400' : 'border-gray-200'}`}
+                        placeholder='10001'
+                      />
+                      {shippingErrors.zip && (
+                        <p className='text-red-500 text-xs mt-1'>{shippingErrors.zip.message}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div>
+                      <label className='block text-sm font-medium text-gray-700 mb-2'>State</label>
+                      <input
+                        {...registerShipping('state')}
+                        className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm
+                          ${shippingErrors.state ? 'border-red-400' : 'border-gray-200'}`}
+                        placeholder='NY'
+                      />
+                      {shippingErrors.state && (
+                        <p className='text-red-500 text-xs mt-1'>{shippingErrors.state.message}</p>
+                      )}
                     </div>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-2'>Phone</label>
-                      <input value={contact.phone} onChange={e => setContact({...contact, phone: e.target.value})}
-                        className='w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm' placeholder='+1 234 567 8900' />
+                      <label className='block text-sm font-medium text-gray-700 mb-2'>Country</label>
+                      <select
+                        {...registerShipping('country')}
+                        className='w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm'
+                      >
+                        <option value='US'>United States</option>
+                        <option value='UK'>United Kingdom</option>
+                        <option value='CA'>Canada</option>
+                        <option value='AU'>Australia</option>
+                      </select>
                     </div>
-                    <button onClick={nextStep} disabled={!contact.name || !contact.email}
-                      className='w-full bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-bold py-3 rounded-xl transition-colors mt-4'>
-                      Continue to Shipping
+                  </div>
+
+                  <div className='flex gap-3 mt-4'>
+                    <button
+                      type='button'
+                      onClick={prevStep}
+                      className='flex-1 border border-gray-200 text-gray-600 font-medium py-3 rounded-xl hover:bg-gray-50 transition-colors'
+                    >
+                      Back
+                    </button>
+                    <button
+                      type='submit'
+                      className='flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl transition-colors'
+                    >
+                      Continue
                     </button>
                   </div>
-                )}
-
-                {/* Step 2 — Shipping */}
-                {step === 2 && (
-                  <div className='space-y-4'>
-                    <h2 className='text-lg font-bold text-gray-900 mb-6'>Shipping Address</h2>
-                    <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-2'>Street Address</label>
-                      <input value={shipping.address} onChange={e => setShipping({...shipping, address: e.target.value})}
-                        className='w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm' placeholder='123 Main St' />
-                    </div>
-                    <div className='grid grid-cols-2 gap-4'>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>City</label>
-                        <input value={shipping.city} onChange={e => setShipping({...shipping, city: e.target.value})}
-                          className='w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm' placeholder='New York' />
-                      </div>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>ZIP Code</label>
-                        <input value={shipping.zip} onChange={e => setShipping({...shipping, zip: e.target.value})}
-                          className='w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm' placeholder='10001' />
-                      </div>
-                    </div>
-                    <div className='grid grid-cols-2 gap-4'>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>State</label>
-                        <input value={shipping.state} onChange={e => setShipping({...shipping, state: e.target.value})}
-                          className='w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm' placeholder='NY' />
-                      </div>
-                      <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-2'>Country</label>
-                        <select value={shipping.country} onChange={e => setShipping({...shipping, country: e.target.value})}
-                          className='w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm'>
-                          <option value='US'>United States</option>
-                          <option value='UK'>United Kingdom</option>
-                          <option value='CA'>Canada</option>
-                          <option value='AU'>Australia</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className='flex gap-3 mt-4'>
-                      <button onClick={prevStep} className='flex-1 border border-gray-200 text-gray-600 font-medium py-3 rounded-xl hover:bg-gray-50 transition-colors'>Back</button>
-                      <button onClick={nextStep} disabled={!shipping.address || !shipping.city}
-                        className='flex-1 bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-bold py-3 rounded-xl transition-colors'>
-                        Continue
-                      </button>
-                    </div>
-                  </div>
-                )}
+                </form>
+              )}
 
                 {/* Step 3 — Delivery Method */}
                 {step === 3 && (
