@@ -6,29 +6,35 @@ import { Mail, ArrowLeft, CheckCircle, ShoppingBag } from 'lucide-react';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 import PageTransition from '@/components/layout/PageTransition';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { forgotPasswordSchema, type ForgotPasswordFormData } from '@/lib/validations/auth.schemas';
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await api.post('/auth/forgot-password', { email });
-      setSent(true);
-      toast.success('Reset email sent!');
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Something went wrong');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {register, handleSubmit, watch, formState: { errors }} = useForm<ForgotPasswordFormData>({
+  resolver: zodResolver(forgotPasswordSchema)});
+
+  const emailValue = watch('email');
+
+  const onSubmit = async (data: ForgotPasswordFormData) => {
+  setLoading(true);
+  try {
+    await api.post('/auth/forgot-password', { email: data.email });
+    setSent(true);
+    toast.success('Reset email sent!');
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || 'Something went wrong');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <PageTransition>
-      <div className='min-h-screen bg-gradient-to-br from-brand-50 to-white flex items-center justify-center px-4 py-12'>
+      <div className='min-h-screen bg-linear-to-br from-brand-50 to-white flex items-center justify-center px-4 py-12'>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -42,23 +48,25 @@ export default function ForgotPasswordPage() {
                 </div>
                 <h1 className='text-2xl font-bold text-gray-900'>Forgot Password?</h1>
                 <p className='text-gray-500 mt-2 text-sm'>
-                  Enter your email and we'll send you a reset link
+                  Enter your email and we will send you a reset link
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className='space-y-5'>
+              <form onSubmit={handleSubmit(onSubmit)} className='space-y-5'>
                 <div>
                   <label className='block text-sm font-medium text-gray-700 mb-2'>Email</label>
                   <div className='relative'>
                     <Mail size={18} className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400' />
                     <input
+                      {...register('email')}
                       type='email'
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
                       placeholder='you@example.com'
-                      required
-                      className='w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm'
+                      className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm
+                        ${errors.email ? 'border-red-400' : 'border-gray-200'}`}
                     />
+                    {errors.email && (
+                      <p className='text-red-500 text-xs mt-1'>{errors.email.message}</p>
+                    )}
                   </div>
                 </div>
 
@@ -85,7 +93,7 @@ export default function ForgotPasswordPage() {
               <h2 className='text-2xl font-bold text-gray-900 mb-2'>Check your email!</h2>
               <p className='text-gray-500 text-sm mb-6'>
                 We sent a password reset link to<br />
-                <span className='font-semibold text-gray-900'>{email}</span>
+                <span className='font-semibold text-gray-900'>{emailValue}</span>
               </p>
               <p className='text-xs text-gray-400 mb-6'>
                 Didn't receive it? Check your spam folder or try again.

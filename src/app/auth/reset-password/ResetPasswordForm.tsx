@@ -7,43 +7,36 @@ import { Lock, Eye, EyeOff, ShoppingBag } from 'lucide-react';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 import PageTransition from '@/components/layout/PageTransition';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { resetPasswordSchema, type ResetPasswordFormData } from '@/lib/validations/auth.schemas';
 
 export default function ResetPasswordForm() {
   const searchParams                    = useSearchParams();
   const router                          = useRouter();
-  const [password, setPassword]         = useState('');
-  const [confirm, setConfirm]           = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading]           = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password.length < 8) {
-      toast.error('Password must be at least 8 characters');
-      return;
-    }
-    if (password !== confirm) {
-      toast.error('Passwords do not match');
-      return;
-    }
+  const {register, handleSubmit, formState: { errors }} = useForm<ResetPasswordFormData>({
+  resolver: zodResolver(resetPasswordSchema)});
 
-    const token = searchParams.get('token');
-    if (!token) {
-      toast.error('Invalid reset link');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await api.post('/auth/reset-password', { token, password });
-      toast.success('Password reset! Please log in.');
-      router.push('/auth/login');
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Reset failed. The link may have expired.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const onSubmit = async (data: ResetPasswordFormData) => {
+  const token = searchParams.get('token');
+  if (!token) {
+    toast.error('Invalid reset link');
+    return;
+  }
+  setLoading(true);
+  try {
+    await api.post('/auth/reset-password', { token, password: data.password });
+    toast.success('Password reset! Please log in.');
+    router.push('/auth/login');
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || 'Reset failed. The link may have expired.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <PageTransition>
@@ -61,19 +54,21 @@ export default function ResetPasswordForm() {
             <p className='text-gray-500 mt-2 text-sm'>Must be at least 8 characters</p>
           </div>
 
-          <form onSubmit={handleSubmit} className='space-y-5'>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-5'>
             <div>
               <label className='block text-sm font-medium text-gray-700 mb-2'>New Password</label>
               <div className='relative'>
                 <Lock size={18} className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400' />
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder='Min. 8 characters'
-                  required
-                  className='w-full pl-11 pr-11 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm'
-                />
+                    {...register('password')}
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder='Min. 8 characters'
+                    className={`w-full pl-11 pr-11 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm
+                        ${errors.password ? 'border-red-400' : 'border-gray-200'}`}
+                    />
+                    {errors.password && (
+                    <p className='text-red-500 text-xs mt-1'>{errors.password.message}</p>
+                    )}
                 <button
                   type='button'
                   onClick={() => setShowPassword(!showPassword)}
@@ -89,13 +84,15 @@ export default function ResetPasswordForm() {
               <div className='relative'>
                 <Lock size={18} className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400' />
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={confirm}
-                  onChange={e => setConfirm(e.target.value)}
-                  placeholder='Repeat your password'
-                  required
-                  className='w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm'
-                />
+                    {...register('confirm')}
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder='Repeat your password'
+                    className={`w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm
+                        ${errors.confirm ? 'border-red-400' : 'border-gray-200'}`}
+                    />
+                    {errors.confirm && (
+                    <p className='text-red-500 text-xs mt-1'>{errors.confirm.message}</p>
+                    )}
               </div>
             </div>
 
