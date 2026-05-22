@@ -4,7 +4,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: { 50:'#f5f3ff', 100:'#ede9fe', 500:'#7c3aed', 600:'#6d28d9', 900:'#4c1d95' }
+        brand: { 50:  '#f0f4f8',
+          100: '#c8d8e8',
+          200: '#a0bdd8',
+          300: '#6e9cbd',
+          400: '#4a7fa5',
+          500: '#2e6490',
+          600: '#1e3a5f',
+          700: '#162c49',
+          800: '#0d1f33',
+          900: '#07111e', }
       },
       fontFamily: { sans: ['Inter','sans-serif'] },
       animation: {

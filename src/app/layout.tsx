@@ -9,32 +9,32 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'TechVault — Shop the Latest Gadgets',
-    template: '%s | TechVault',
+    default: 'VoltCart — Shop the Latest Gadgets',
+    template: '%s | VoltCart',
   },
   description: 'Discover cutting-edge smartphones, laptops, audio gear, and more. Free shipping on orders over $50. 2-year warranty on all electronics.',
   keywords: ['electronics', 'gadgets', 'smartphones', 'laptops', 'headphones', 'tablets', 'tech store'],
-  authors: [{ name: 'TechVault' }],
-  creator: 'TechVault',
+  authors: [{ name: 'VoltCart' }],
+  creator: 'VoltCart',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://voltcart-frontend.vercel.app',
-    siteName: 'TechVault',
-    title: 'TechVault — Shop the Latest Gadgets',
+    siteName: 'VoltCart',
+    title: 'VoltCart — Shop the Latest Gadgets',
     description: 'Discover cutting-edge smartphones, laptops, audio gear, and more.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'TechVault',
+        alt: 'VoltCart',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TechVault — Shop the Latest Gadgets',
+    title: 'VoltCart — Shop the Latest Gadgets',
     description: 'Discover cutting-edge smartphones, laptops, audio gear, and more.',
     images: ['/og-image.png'],
   },
