@@ -1,19 +1,21 @@
 'use client';
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '@/context/AuthContext';
+import { ThemeProvider } from 'next-themes'
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
+     <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         {children}
         <Toaster position='top-right' />
       </AuthProvider>
     </QueryClientProvider>
+    </ThemeProvider>
   );
 }
