@@ -30,7 +30,7 @@ export default function ProductCard({ product }: { product: any }) {
       toast.error('Please log in to save items');
       return;
     }
-  
+
     const v = product.variants[0];
     toggleWishlist({
       _id:          product._id,
@@ -45,64 +45,106 @@ export default function ProductCard({ product }: { product: any }) {
   };
 
   const img = product.variants[0]?.images[0] ?? null;
+  const discount = product.comparePrice
+    ? Math.round((1 - product.basePrice / product.comparePrice) * 100)
+    : 0;
 
   return (
     <motion.div
-      whileHover={{ y: -6, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
+      whileHover={{ y: -6 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className='bg-white rounded-2xl border border-gray-100 shadow-sm group'
+      className='pc group relative flex flex-col rounded-2xl bg-white dark:bg-[#0c0a14] border border-neutral-100 dark:border-white/[0.06] transition-all duration-250'
     >
-      <Link href={`/products/${product.slug}`}>
-        <div className='relative overflow-hidden rounded-t-2xl aspect-square bg-gray-50'>
+      <Link href={`/products/${product.slug}`} className='block'>
+        {/* image */}
+        <div className='relative overflow-hidden rounded-t-2xl aspect-square bg-[#f5f5f5] dark:bg-white/[0.03]'>
           {img ? (
-            <Image src={img}
-            alt={product.name} 
-            fill  
-            sizes='(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw' 
-            className='object-cover group-hover:scale-105 transition-transform duration-300' />
+            <Image
+              src={img}
+              alt={product.name}
+              fill
+              sizes='(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw'
+              className='object-cover group-hover:scale-105 transition-transform duration-500 ease-out'
+            />
           ) : (
-            <div className='w-full h-full flex items-center justify-center text-gray-300 text-sm'>
+            <div className='flex h-full items-center justify-center text-[12px] text-neutral-300 dark:text-white/15'>
               No Image
             </div>
           )}
-          {product.comparePrice && (
-            <span className='absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full'>
-              -{Math.round((1 - product.basePrice/product.comparePrice)*100)}%
+
+          {/* discount badge */}
+          {discount > 0 && (
+            <span className='absolute top-3 left-3 z-10 text-[11px] font-bold px-2.5 py-1 rounded-full bg-gradient-to-r from-[#ef4444] to-[#dc2626] text-white shadow-lg'>
+              -{discount}%
             </span>
           )}
+
+          {/* wishlist */}
           <button
             onClick={handleWishlist}
             className={`
-              absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center
+              absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center
               shadow-md transition-all duration-200
               opacity-0 group-hover:opacity-100
               ${wishlisted
                 ? 'bg-red-500 text-white'
-                : 'bg-white text-gray-400 hover:text-red-400'}
+                : 'bg-white/90 dark:bg-[#1c1c2a] text-neutral-400 dark:text-white/40 hover:text-red-400 dark:hover:text-red-400'}
             `}
             aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
           >
-            <Heart size={15} className={wishlisted ? 'fill-white' : ''} />
+            <Heart size={14} className={wishlisted ? 'fill-white' : ''} />
           </button>
         </div>
       </Link>
-      <div className='p-4'>
-        <p className='text-xs text-brand-500 font-medium mb-1'>{product.brand}</p>
+
+      {/* body */}
+      <div className='flex flex-1 flex-col gap-1.5 p-4'>
+        {/* brand */}
+        <p className='text-[11px] font-semibold tracking-wider uppercase text-[#7c3aed] dark:text-[#818cf8]'>
+          {product.brand}
+        </p>
+
+        {/* name */}
         <Link href={`/products/${product.slug}`}>
-          <h3 className='font-semibold text-gray-800 text-sm line-clamp-2 hover:text-brand-600'>{product.name}</h3>
+          <h3 className='text-[13.5px] font-bold leading-snug text-neutral-800 dark:text-white/85 transition-colors duration-200 hover:text-[#6366f1] dark:hover:text-[#a5b4fc] line-clamp-2'>
+            {product.name}
+          </h3>
         </Link>
-        <div className='flex items-center gap-1 mt-2'>
-          <Star size={14} className='fill-yellow-400 text-yellow-400' />
-          <span className='text-xs text-gray-600'>{product.avgRating.toFixed(1)} ({product.reviewCount})</span>
-        </div>
-        <div className='flex items-center justify-between mt-3'>
-          <div>
-            <span className='font-bold text-gray-900'>${product.basePrice}</span>
-            {product.comparePrice && <span className='text-xs text-gray-400 line-through ml-2'>${product.comparePrice}</span>}
+
+        {/* rating */}
+        <div className='flex items-center gap-1.5 mt-0.5'>
+          <div className='flex items-center gap-0.5'>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                size={11}
+                strokeWidth={1.5}
+                className={i < Math.round(product.avgRating) ? 'fill-amber-400 text-amber-400' : 'text-neutral-200 dark:text-white/[0.08]'}
+              />
+            ))}
           </div>
-          <button onClick={handleAddToCart} className='bg-brand-500 hover:bg-brand-600 text-white p-2 rounded-xl transition-colors'>
-            <ShoppingCart size={16} />
+          <span className='text-[11.5px] text-neutral-400 dark:text-white/35'>
+            {product.avgRating?.toFixed(1)} ({product.reviewCount})
+          </span>
+        </div>
+
+        {/* spacer */}
+        <div className='flex-1' />
+
+        {/* price + cart */}
+        <div className='flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-white/[0.06]'>
+          <div className='flex items-baseline gap-2'>
+            <span className='text-[16px] font-bold text-neutral-900 dark:text-white/90'>${product.basePrice}</span>
+            {product.comparePrice && (
+              <span className='text-[12px] text-neutral-400 dark:text-white/30 line-through'>${product.comparePrice}</span>
+            )}
+          </div>
+          <button
+            onClick={handleAddToCart}
+            className='flex items-center justify-center w-9 h-9 rounded-xl bg-[#6366f1] dark:bg-[#6366f1] text-white transition-all duration-200 hover:bg-[#4f46e5] dark:hover:bg-[#818cf8] active:scale-90'
+          >
+            <ShoppingCart size={15} strokeWidth={2} />
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-interface User { id:string; name:string; email:string; role:'customer'|'admin'; }
+interface User { id:string; name:string; email:string; photoURL?:string; role:'customer'|'admin'; }
 interface AuthStore {
   user:User|null; accessToken:string|null; isLoading:boolean;
   setAuth:(user:User,token:string)=>void;

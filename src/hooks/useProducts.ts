@@ -39,6 +39,19 @@ export function useProducts(options: UseProductsOptions = {}) {
   });
 }
 
+export function useSearchProducts(query: string) {
+  return useQuery<ProductsResponse>({
+    queryKey: ['products', 'search', query],
+    queryFn: async () => {
+      const params = new URLSearchParams({ search: query, limit: '5' });
+      const { data } = await api.get(`/products?${params}`);
+      return data.data;
+    },
+    enabled: query.trim().length > 0,
+    staleTime: 30000,
+  });
+}
+
 export function useFeaturedProducts() {
   return useQuery<Product[]>({
     queryKey: ['products', 'featured'],

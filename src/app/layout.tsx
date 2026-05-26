@@ -5,11 +5,13 @@ import Navbar from '@/components/layout/Navbar';
 import CartDrawer from '@/components/layout/CartDrawer';
 import ChatWidget from '@/components/layout/ChatWidget';
 import Footer from '@/components/layout/Footer';
-import { Exo_2 } from 'next/font/google';
+import { Exo_2, Inter, Syne } from 'next/font/google';
 import './globals.css';
 
 
 const exo2 = Exo_2({ subsets: ['latin'], variable: '--font-exo-2' });
+const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600'], variable: '--font-inter' });
+const syne = Syne({ subsets: ['latin'], weight: ['700', '800'], variable: '--font-syne' });
 
 export const metadata: Metadata = {
   title: {
@@ -51,7 +53,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <body className={`${exo2.variable} font-sans overflow-x-hidden`} >
+      <body className={`${exo2.variable} ${inter.variable} ${syne.variable} font-sans overflow-x-hidden`} >
         <Providers>
           <AuthProvider>
             <Navbar />
