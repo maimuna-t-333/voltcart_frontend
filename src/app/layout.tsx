@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { AuthProvider } from '@/context/AuthContext';
 import Providers from './Providers';
 import Navbar from '@/components/layout/Navbar';
 import CartDrawer from '@/components/layout/CartDrawer';
@@ -55,13 +54,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang='en' suppressHydrationWarning>
       <body className={`${exo2.variable} ${inter.variable} ${syne.variable} font-sans overflow-x-hidden`} >
         <Providers>
-          <AuthProvider>
-            <Navbar />
-            <main>{children}</main>
-            <CartDrawer />
-            <ChatWidget />
-            <Footer />
-          </AuthProvider>
+          <Navbar />
+          <main>{children}</main>
+          <CartDrawer />
+          <ChatWidget />
+          <Footer />
         </Providers>
       </body>
     </html>
