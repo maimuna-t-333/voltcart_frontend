@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
 
 const api = axios.create({
-  baseURL:         `${process.env.NEXT_PUBLIC_API_URL}/api/v1`,
+  baseURL: '/api/v1',
   withCredentials: true,
 });
 
@@ -17,7 +17,7 @@ api.interceptors.response.use(res=>res, async err=>{
   if (err.response?.status===401 && !orig._retry) {
     orig._retry = true;
     try {
-      const {data} = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/refresh-token`,{},{withCredentials:true});
+      const {data} = await axios.post('/api/v1/auth/refresh-token',{},{withCredentials:true});
       useAuthStore.getState().setAuth(data.data.user, data.data.accessToken);
       orig.headers.Authorization = `Bearer ${data.data.accessToken}`;
       return api(orig);

@@ -36,6 +36,7 @@ export function useProducts(options: UseProductsOptions = {}) {
       const { data } = await api.get(`/products?${params}`);
       return data.data;
     },
+    placeholderData: (prev) => prev,
   });
 }
 
