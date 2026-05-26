@@ -85,17 +85,17 @@ export default function FeaturedProducts() {
       <div className='absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-vc-accent/35 to-transparent' />
 
       <motion.div
-        className='absolute top-1/3 `h-125` `w-125` rounded-full pointer-events-none'
+        className='absolute top-1/3 h-125 w-125 rounded-full pointer-events-none'
         style={{
           left: glowX,
           background: 'radial-gradient(ellipse at center, color-mix(in srgb, #6366f1 7%, transparent) 0%, transparent 70%)',
         }}
       />
-      <div className='absolute bottom-1/3 -right-32 ``size-100` rounded-full bg-vc-accent/4 dark:bg-vc-accent/5 blur-[140px]' />
+      <div className='absolute bottom-1/3 -right-32 size-100 rounded-full bg-vc-accent/4 dark:bg-vc-accent/5 blur-[140px]' />
 
-      <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 `size-125` rounded-full border border-vc-accent/3 dark:border-vc-accent/4 pointer-events-none' />
+      <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-125 rounded-full border border-vc-accent/3 dark:border-vc-accent/4 pointer-events-none' />
 
-      <div className='relative z-10 mx-auto `max-w-300` px-7 py-16 sm:py-20'>
+      <div className='relative z-10 mx-auto max-w-300 px-7 py-16 sm:py-20'>
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -139,7 +139,7 @@ export default function FeaturedProducts() {
         {isLoading ? (
           <div className='flex gap-5 overflow-hidden'>
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className='`min-w-70` shrink-0'>
+              <div key={i} className='min-w-70 shrink-0'>
                 <ProductCardSkeleton />
               </div>
             ))}
@@ -170,7 +170,7 @@ export default function FeaturedProducts() {
               <div
                 ref={scrollRef}
                 onScroll={handleScroll}
-                className='flex gap-5 sm:gap-6 overflow-x-auto overflow-y-visible pb-4 -mx-7 `sm:mx-0` px-7 sm:px-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [-webkit-overflow-scrolling:touch]'
+                className='flex gap-5 sm:gap-6 overflow-x-auto overflow-y-visible pb-4 -mx-7 sm:mx-0 px-7 sm:px-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden [-webkit-overflow-scrolling:touch]'
               >
                 {/* ═══ HERO CARD ═══ */}
                 {hero && (

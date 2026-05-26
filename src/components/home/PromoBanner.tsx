@@ -57,7 +57,7 @@ export default function PromoBanner() {
     <section className='relative overflow-hidden border-y border-neutral-100 dark:border-white/6 bg-[#f2f2f8] dark:bg-[#08080e] transition-colors duration-400'>
       <div className='absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-vc-accent/35 to-transparent' />
 
-      <div className='relative z-10 mx-auto `max-w-300`'>
+      <div className='relative z-10 mx-auto max-w-300'>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'>
           {perks.map((perk, i) => {
             const Icon = perk.icon;
@@ -113,7 +113,7 @@ export default function PromoBanner() {
                 </div>
 
                 {/* Text */}
-                <div className='flex flex-col `gap-1`'>
+                <div className='flex flex-col gap-1'>
                   <div className='flex items-center gap-2'>
                     <p className={`
                       text-[14px] font-bold leading-tight
@@ -140,7 +140,7 @@ export default function PromoBanner() {
 
                 {/* Bottom sliding accent bar */}
                 <div
-                  className='absolute bottom-0 left-0 `h-0.5` rounded-full w-0 group-hover:w-full transition-[width] duration-300 ease-out'
+                  className='absolute bottom-0 left-0 h-0.5 rounded-full w-0 group-hover:w-full transition-[width] duration-300 ease-out'
                   style={{ background: `linear-gradient(90deg, ${perk.accent}, ${perk.accent}cc)` }}
                 />
               </motion.div>
