@@ -14,7 +14,10 @@ export default function StarRating({ rating, size = 16, interactive = false, onC
       <div className='flex items-center gap-0.5'>
         {Array.from({ length: 5 }).map((_, i) => (
           <Star key={i} size={size}
-            className={i < Math.floor(rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200 fill-gray-200'}
+            style={{
+              fill: i < Math.floor(rating) ? '#fbbf24' : 'var(--tx3)',
+              color: i < Math.floor(rating) ? '#fbbf24' : 'var(--tx3)',
+            }}
           />
         ))}
       </div>
@@ -22,14 +25,17 @@ export default function StarRating({ rating, size = 16, interactive = false, onC
   }
 
   return (
-    <div className='flex items-center gap-0.5'>
+    <div className='flex items-center gap-0.5' style={{ color: 'var(--tx3)' }}>
+      <style>{`
+        .star-btn { color: inherit; }
+        .star-btn:hover { color: #fbbf24; }
+        .star-btn--active { color: #fbbf24 !important; }
+      `}</style>
       {Array.from({ length: 5 }).map((_, i) => (
         <button key={i} type='button' onClick={() => onChange?.(i + 1)}
-          className='transition-colors hover:scale-110'
+          className={`star-btn hover:scale-110 transition-all ${i < rating ? 'star-btn--active' : ''}`}
         >
-          <Star size={size}
-            className={`cursor-pointer transition-colors ${i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 fill-gray-100 hover:fill-yellow-200 hover:text-yellow-300'}`}
-          />
+          <Star size={size} className='cursor-pointer' style={{ fill: 'currentColor' }} />
         </button>
       ))}
     </div>

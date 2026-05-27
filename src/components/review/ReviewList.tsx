@@ -44,13 +44,13 @@ export default function ReviewList({ reviews, isLoading }: ReviewListProps) {
             animate={{ opacity: 1, y: 0 }}
             className='bg-gray-50 rounded-2xl p-5'
           >
-            <div className='flex items-center justify-between mb-2'>
-              <div className='flex items-center gap-3'>
-                <div className='w-9 h-9 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-sm font-bold'>
+            <div className='flex items-center justify-between mb-2 gap-2'>
+              <div className='flex items-center gap-3 min-w-0'>
+                <div className='w-9 h-9 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-sm font-bold shrink-0'>
                   {review.user.name.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <p className='font-semibold text-gray-900 text-sm'>{review.user.name}</p>
+                <div className='min-w-0'>
+                  <p className='font-semibold text-gray-900 text-sm truncate'>{review.user.name}</p>
                   <p className='text-xs text-gray-400'>{formatDate(review.createdAt)}</p>
                 </div>
               </div>

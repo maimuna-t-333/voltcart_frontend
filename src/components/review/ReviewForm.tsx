@@ -19,8 +19,10 @@ export default function ReviewForm({ slug }: ReviewFormProps) {
 
   if (!user) {
     return (
-      <div className='bg-gray-50 rounded-2xl p-6 text-center'>
-        <p className='text-gray-500 text-sm'>Please <a href='/auth/login' className='text-brand-500 font-semibold hover:underline'>log in</a> to write a review</p>
+      <div className='rounded-2xl p-6 text-center' style={{ background: 'var(--surface)' }}>
+        <p className='text-sm' style={{ color: 'var(--tx3)' }}>
+          Please <a href='/auth/login' style={{ color: 'var(--accent)', fontWeight: 600 }} className='hover:underline'>log in</a> to write a review
+        </p>
       </div>
     );
   }
@@ -58,36 +60,39 @@ export default function ReviewForm({ slug }: ReviewFormProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       onSubmit={handleSubmit}
-      className='bg-gray-50 rounded-2xl p-6 space-y-4'
+      className='rounded-2xl p-6 space-y-4'
+      style={{ background: 'var(--surface)' }}
     >
-      <h3 className='font-semibold text-gray-900'>Write a Review</h3>
+      <h3 className='font-semibold' style={{ color: 'var(--tx)' }}>Write a Review</h3>
 
       <div>
-        <label className='block text-sm font-medium text-gray-700 mb-1.5'>Rating</label>
+        <label className='block text-sm font-medium mb-1.5' style={{ color: 'var(--tx2)' }}>Rating</label>
         <StarRating rating={rating} size={24} interactive onChange={setRating} />
       </div>
 
       <div>
-        <label htmlFor='review-title' className='block text-sm font-medium text-gray-700 mb-1.5'>Title (optional)</label>
+        <label htmlFor='review-title' className='block text-sm font-medium mb-1.5' style={{ color: 'var(--tx2)' }}>Title (optional)</label>
         <input
           id='review-title'
           type='text'
           value={title}
           onChange={e => setTitle(e.target.value)}
           placeholder='Summarize your review'
-          className='w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent'
+          className='w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-vc-accent focus:border-transparent'
+          style={{ background: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--tx)' }}
         />
       </div>
 
       <div>
-        <label htmlFor='review-comment' className='block text-sm font-medium text-gray-700 mb-1.5'>Comment</label>
+        <label htmlFor='review-comment' className='block text-sm font-medium mb-1.5' style={{ color: 'var(--tx2)' }}>Comment</label>
         <textarea
           id='review-comment'
           rows={4}
           value={comment}
           onChange={e => setComment(e.target.value)}
           placeholder='Share your experience with this product'
-          className='w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none'
+          className='w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-vc-accent focus:border-transparent resize-none'
+          style={{ background: 'var(--bg)', borderColor: 'var(--border)', color: 'var(--tx)' }}
         />
       </div>
 
@@ -96,7 +101,11 @@ export default function ReviewForm({ slug }: ReviewFormProps) {
         disabled={submit.isPending}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className='bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-colors'
+        className='text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-all disabled:opacity-50'
+        style={{
+          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          boxShadow: '0 4px 20px rgba(99,102,241,0.35), 0 0 40px rgba(99,102,241,0.1)',
+        }}
       >
         {submit.isPending ? 'Submitting…' : 'Submit Review'}
       </motion.button>
