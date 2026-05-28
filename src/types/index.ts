@@ -42,6 +42,9 @@ export interface CartItem {
   image: string;
   price: number;
   quantity: number;
+  slug: string;
+  variantColor?: string;
+  variantStorage?: string;
 }
 
 export interface Review {

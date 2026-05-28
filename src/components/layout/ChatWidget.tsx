@@ -178,19 +178,6 @@ export default function ChatWidget() {
           --cw-shadow: rgba(99,102,241,0.15);
           --cw-bot-border: rgba(99,102,241,0.08);
         }
-        .dark .cw {
-          --cw-bg: #08080e;
-          --cw-surface: #14141f;
-          --cw-header: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-          --cw-border: #1e1e30;
-          --cw-text: #e8e8f0;
-          --cw-muted: #6b6b8a;
-          --cw-accent: #818cf8;
-          --cw-accent-dim: rgba(129,140,248,0.15);
-          --cw-dim: rgba(255,255,255,0.04);
-          --cw-shadow: rgba(129,140,248,0.1);
-          --cw-bot-border: rgba(129,140,248,0.1);
-        }
         .cw-scroll::-webkit-scrollbar { width: 3px; }
         .cw-scroll::-webkit-scrollbar-track { background: transparent; }
         .cw-scroll::-webkit-scrollbar-thumb { background: var(--cw-dim); border-radius: 4px; }
@@ -204,11 +191,6 @@ export default function ChatWidget() {
           box-shadow: 0 4px 20px rgba(99,102,241,0.35);
         }
         .cw-fab:hover { filter: brightness(1.12); box-shadow: 0 6px 28px rgba(99,102,241,0.45); }
-        .dark .cw-fab {
-          background: linear-gradient(135deg, #818cf8, #6366f1);
-          box-shadow: 0 4px 20px rgba(129,140,248,0.25);
-        }
-        .dark .cw-fab:hover { filter: brightness(1.12); box-shadow: 0 6px 28px rgba(129,140,248,0.35); }
       `}</style>
     </div>
   );

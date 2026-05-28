@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-brand-50: #f5f3ff;
@@ -16,6 +15,8 @@
 
 /* ── Hero banner tokens ── */
 :root {
+  color-scheme: light;
+  --color-scheme: light;
   --bg:         #f4f5fa;
   --surface:    rgba(0,0,0,0.02);
   --border:     rgba(0,0,0,0.06);
@@ -35,26 +36,9 @@
   --spec-bg:    rgba(0,0,0,0.02);
   --spec-bdr:   rgba(0,0,0,0.06);
 }
-.dark {
-  --bg:         #08080e;
-  --surface:    rgba(255,255,255,0.035);
-  --border:     rgba(255,255,255,0.07);
-  --border-hi:  rgba(255,255,255,0.13);
-  --tx:         #f0f0f8;
-  --tx2:        #7b7b96;
-  --tx3:        #38384a;
-  --accent:     #6366f1;
-  --accent2:    #8b5cf6;
-  --accent-dim: rgba(99,102,241,0.14);
-  --accent-glow:rgba(99,102,241,0.25);
-  --card:       rgba(14,14,22,0.85);
-  --card-bdr:   rgba(255,255,255,0.09);
-  --price-old:  rgba(255,255,255,0.30);
-  --ticker-bg:  rgba(255,255,255,0.02);
-  --ticker-bdr: rgba(255,255,255,0.06);
-  --spec-bg:    rgba(255,255,255,0.04);
-  --spec-bdr:   rgba(255,255,255,0.08);
-}
+
+/* ── Body background ── */
+body { background: var(--bg); }
 
 /* ── Newsletter tokens ── */
 :root {
@@ -72,22 +56,6 @@
   --nl-trust: rgba(0,0,0,0.3);
   --nl-btn-bg: linear-gradient(135deg, #6366f1, #8b5cf6);
   --nl-btn-shadow: 0 4px 20px rgba(99,102,241,0.25);
-}
-.dark {
-  --nl-bg: linear-gradient(160deg, #0c0a1a 0%, #1a0e2e 35%, #1c1038 65%, #0f0c1e 100%);
-  --nl-glass: rgba(255,255,255,0.04);
-  --nl-glass-border: rgba(255,255,255,0.08);
-  --nl-input-bg: rgba(255,255,255,0.06);
-  --nl-input-border: rgba(255,255,255,0.1);
-  --nl-text: #ffffff;
-  --nl-muted: #a5b4fc;
-  --nl-orb-1: rgba(99,102,241,0.4);
-  --nl-orb-2: rgba(168,85,247,0.3);
-  --nl-orb-3: rgba(129,140,248,0.2);
-  --nl-btn-text: #0c0a1a;
-  --nl-trust: rgba(165,180,252,0.4);
-  --nl-btn-bg: linear-gradient(135deg, #c7d2fe, #a5b4fc, #818cf8);
-  --nl-btn-shadow: 0 4px 20px rgba(99,102,241,0.3), 0 0 40px rgba(99,102,241,0.1);
 }
 
 @keyframes shimmer {
@@ -155,24 +123,6 @@
   --vc-hint-border:  #ebebeb;
   --vc-theme-border: #e0e0e0;
   --vc-theme-color:  #cccccc;
-}
-
-.dark {
-  --vc-bg:           #111111;
-  --vc-border:       #1f1f1f;
-  --vc-shadow:       0 8px 32px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.25);
-  --vc-text:         #e8e8e8;
-  --vc-muted:        #666666;
-  --vc-hover:        rgba(255,255,255,0.05);
-  --vc-divider:      #1c1c1c;
-  --vc-em-bg:        #1a1a1a;
-  --vc-em-border:    #222222;
-  --vc-result-hover: rgba(99,102,241,0.10);
-  --vc-hint-color:   #333333;
-  --vc-hint-bg:      #161616;
-  --vc-hint-border:  #222222;
-  --vc-theme-border: #2a2a2a;
-  --vc-theme-color:  #555555;
 }
 
 /* ── Navbar ── */
@@ -525,15 +475,4 @@
   --auth-accent: #6366f1;
   --auth-success-icon: #22c55e;
   --auth-error: #ef4444;
-}
-.dark {
-  --auth-text: #e8e8f0;
-  --auth-muted: #6b6b82;
-  --auth-label: #8a8a9e;
-  --auth-input-bg: rgba(255,255,255,0.035);
-  --auth-input-border: #1e1e30;
-  --auth-divider: #1a1a28;
-  --auth-accent: #818cf8;
-  --auth-success-icon: #4ade80;
-  --auth-error: #f87171;
 }

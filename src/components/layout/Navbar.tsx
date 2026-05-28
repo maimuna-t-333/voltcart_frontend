@@ -3,8 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Search, ShoppingCart, UserCircle, X, ArrowRight, Moon, Sun, Menu, Smartphone, Laptop, Headphones, Tablet, Watch, Gamepad2, Mouse, Home, Sparkles } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Search, ShoppingCart, UserCircle, X, ArrowRight, Menu, Smartphone, Laptop, Headphones, Tablet, Watch, Gamepad2, Mouse, Home, Sparkles } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useUIStore } from '@/store/uiStore';
 import { useAuthStore } from '@/store/authStore';
@@ -44,13 +43,10 @@ export default function Navbar() {
   const inputRef  = useRef<HTMLInputElement>(null);
   const pillRef   = useRef<HTMLDivElement>(null);
   const prevCount = useRef(0);
-
-  const { resolvedTheme, setTheme } = useTheme();
   const count    = useCartStore(s => s.getCount());
   const openCart = useUIStore(s => s.openCart);
   const user     = useAuthStore(s => s.user);
   const router   = useRouter();
-  const isDark   = resolvedTheme === 'dark';
 
   const { data: searchData, isFetching } = useSearchProducts(debounced);
   const results = searchData?.products ?? [];
@@ -132,8 +128,6 @@ export default function Navbar() {
     }
     openCart();
   };
-
-  const toggleTheme = () => setTheme(isDark ? 'light' : 'dark');
 
   return (
     <div className='vc-bar'>
@@ -272,36 +266,6 @@ export default function Navbar() {
                     }
                   </Link>
 
-                  {mounted && (
-                    <button
-                      className='vc-theme-btn vc-desk-only'
-                      onClick={toggleTheme}
-                      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-                    >
-                      <AnimatePresence mode='wait'>
-                        {isDark ? (
-                          <motion.span key='moon'
-                            initial={{ rotate: -30, opacity: 0, scale: 0.7 }}
-                            animate={{ rotate: 0,   opacity: 1, scale: 1   }}
-                            exit={{    rotate:  30, opacity: 0, scale: 0.7 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <Moon size={14} />
-                          </motion.span>
-                        ) : (
-                          <motion.span key='sun'
-                            initial={{ rotate:  30, opacity: 0, scale: 0.7 }}
-                            animate={{ rotate: 0,   opacity: 1, scale: 1   }}
-                            exit={{    rotate: -30, opacity: 0, scale: 0.7 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <Sun size={14} />
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </button>
-                  )}
-
                   <button
                     className='vc-ico vc-hamburger'
                     onClick={() => setMenuOpen(v => !v)}
@@ -366,16 +330,6 @@ export default function Navbar() {
                         <span>{user ? 'Account' : 'Sign in'}</span>
                       </Link>
 
-                      {mounted && (
-                        <button className='vc-mobile-link' onClick={toggleTheme}>
-                          {isDark ? (
-                            <Sun size={16} strokeWidth={1.8} />
-                          ) : (
-                            <Moon size={16} strokeWidth={1.8} />
-                          )}
-                          <span>{isDark ? 'Light mode' : 'Dark mode'}</span>
-                        </button>
-                      )}
                     </div>
                   </motion.div>
                 )}

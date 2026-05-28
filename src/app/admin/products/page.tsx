@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -11,21 +11,31 @@ import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
+const productColors = ['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f97316','#22c55e','#14b8a6','#3b82f6'];
+
+function ProductThumb({ name }: { name: string }) {
+  const initial = name[0].toUpperCase();
+  const hash = name.split('').reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
+  const color = productColors[Math.abs(hash) % productColors.length];
+  return (
+    <div className='w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold shrink-0'
+      style={{ background: `${color}12`, color }}>
+      {initial}
+    </div>
+  );
+}
+
 export default function AdminProductsPage() {
   const router = useRouter();
   const user = useAuthStore(s => s.user);
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    if (!user) router.push('/auth/login');
-    else if (user.role !== 'admin') router.push('/');
-  }, [user]);
+  if (!user || user.role !== 'admin') { router.push('/auth/login'); return null; }
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'products', search],
     queryFn: async () => {
-      const params = search ? `?search=${search}` : '';
       const { data } = await api.get(`/products?limit=50${search ? `&search=${search}` : ''}`);
       return data.data;
     },
@@ -44,37 +54,45 @@ export default function AdminProductsPage() {
     if (confirm(`Delete "${name}"?`)) deleteMutation.mutate(id);
   };
 
-  if (!user || user.role !== 'admin') return null;
-
   return (
     <PageTransition>
-      <div className='max-w-7xl mx-auto px-4 py-8'>
-        <div className='flex items-center justify-between mb-8'>
+      <div className='p-6 lg:p-8 max-w-7xl mx-auto'>
+        {/* Header */}
+        <div className='flex items-center justify-between mb-6'>
           <div>
-            <h1 className='text-2xl font-bold text-gray-900'>Products</h1>
-            <p className='text-gray-500 mt-1'>{data?.total || 0} total products</p>
+            <h1 className='text-xl font-bold' style={{ color: 'var(--tx)' }}>Products</h1>
+            <p className='text-sm mt-0.5' style={{ color: 'var(--tx3)' }}>{data?.total || 0} total products</p>
           </div>
           <Link href='/admin/products/new'
-            className='flex items-center gap-2 bg-brand-500 text-white font-semibold px-5 py-2.5 rounded-xl hover:bg-brand-600 transition-colors'>
-            <Plus size={18} />
+            className='flex items-center gap-2 font-semibold px-4 py-2 rounded-xl text-white transition-all text-sm'
+            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+            <Plus size={15} strokeWidth={1.5} />
             Add Product
           </Link>
         </div>
 
         {/* Search */}
-        <div className='relative mb-6'>
-          <Search size={18} className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400' />
+        <div className='relative mb-5'>
+          <Search size={15} className='absolute left-3.5 top-1/2 -translate-y-1/2' style={{ color: 'var(--tx3)' }} strokeWidth={1.5} />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder='Search products...'
-            className='w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500'
+            className='w-full pl-10 pr-4 py-2.5 rounded-xl text-sm outline-none transition-all'
+            style={{
+              background: 'var(--card)',
+              border: '1px solid var(--card-bdr)',
+              color: 'var(--tx)',
+            }}
+            onFocus={e => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.1)'; }}
+            onBlur={e => { e.currentTarget.style.borderColor = 'var(--card-bdr)'; e.currentTarget.style.boxShadow = 'none'; }}
           />
         </div>
 
-        {/* Products table */}
-        <div className='bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden'>
-          <div className='grid grid-cols-12 gap-4 p-4 bg-gray-50 text-sm font-semibold text-gray-500 border-b border-gray-100'>
+        {/* Table */}
+        <div className='rounded-xl overflow-x-auto' style={{ background: 'var(--card)', border: '1px solid var(--card-bdr)' }}>
+          {/* Header row */}
+          <div className='grid grid-cols-12 gap-3 px-5 py-3 text-xs font-semibold uppercase tracking-wider min-w-[640px]' style={{ color: 'var(--tx3)', borderBottom: '1px solid var(--card-bdr)', background: 'var(--surface)' }}>
             <div className='col-span-5'>Product</div>
             <div className='col-span-2'>Category</div>
             <div className='col-span-2'>Price</div>
@@ -84,46 +102,48 @@ export default function AdminProductsPage() {
           </div>
 
           {isLoading ? (
-            <div className='p-8 text-center text-gray-400'>Loading...</div>
+            <div className='p-10 text-center text-sm' style={{ color: 'var(--tx3)' }}>Loading...</div>
           ) : (
-            <div className='divide-y divide-gray-50'>
-              {data?.products?.map((product: any, i: number) => (
-                <motion.div
-                  key={product._id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.03 }}
-                  className='grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 transition-colors'
-                >
-                  <div className='col-span-5 flex items-center gap-3'>
-                    <div className='w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg flex-shrink-0'>📦</div>
-                    <div className='min-w-0'>
-                      <p className='font-medium text-gray-900 truncate'>{product.name}</p>
-                      <p className='text-gray-400 text-xs'>{product.brand}</p>
+            <div className='divide-y' style={{ borderColor: 'var(--card-bdr)' }}>
+              {data?.products?.map((product: any, i: number) => {
+                const totalStock = product.variants?.reduce((s: number, v: any) => s + v.stock, 0) || 0;
+                return (
+                  <motion.div
+                    key={product._id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.025 }}
+                    className='grid grid-cols-12 gap-3 px-5 py-3.5 items-center transition-colors'
+                    onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <div className='col-span-5 flex items-center gap-3 min-w-0'>
+                      <ProductThumb name={product.name} />
+                      <div className='min-w-0'>
+                        <p className='font-medium text-sm truncate' style={{ color: 'var(--tx)' }}>{product.name}</p>
+                        <p className='text-xs' style={{ color: 'var(--tx3)' }}>{product.brand}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className='col-span-2 text-sm text-gray-600'>{product.category}</div>
-                  <div className='col-span-2 font-medium'>{formatPrice(product.basePrice)}</div>
-                  <div className='col-span-1 text-sm'>
-                    {product.variants.reduce((s: number, v: any) => s + v.stock, 0)}
-                  </div>
-                  <div className='col-span-1'>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${product.status === 'active' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
-                      {product.status}
-                    </span>
-                  </div>
-                  <div className='col-span-1 flex items-center gap-2'>
-                    <Link href={`/admin/products/${product._id}/edit`}
-                      className='text-brand-500 hover:text-brand-600'>
-                      <Edit size={16} />
-                    </Link>
-                    <button onClick={() => handleDelete(product._id, product.name)}
-                      className='text-red-400 hover:text-red-500'>
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
+                    <div className='col-span-2 text-sm' style={{ color: 'var(--tx2)' }}>{product.category}</div>
+                    <div className='col-span-2 text-sm font-medium' style={{ color: 'var(--tx)' }}>{formatPrice(product.basePrice)}</div>
+                    <div className='col-span-1 text-sm' style={{ color: 'var(--tx2)' }}>{totalStock}</div>
+                    <div className='col-span-1'>
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${product.status === 'active' ? 'text-green-500' : ''}`}
+                        style={{ background: product.status === 'active' ? 'rgba(34,197,94,0.1)' : 'var(--surface)', color: product.status === 'active' ? '#22c55e' : 'var(--tx3)' }}>
+                        {product.status}
+                      </span>
+                    </div>
+                    <div className='col-span-1 flex items-center gap-2'>
+                      <Link href={`/admin/products/${product._id}/edit`} style={{ color: '#6366f1' }}>
+                        <Edit size={14} strokeWidth={1.5} />
+                      </Link>
+                      <button onClick={() => handleDelete(product._id, product.name)} style={{ color: '#f87171' }}>
+                        <Trash2 size={14} strokeWidth={1.5} />
+                      </button>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           )}
         </div>

@@ -10,19 +10,21 @@ import api from '@/lib/axios';
 import { formatPrice } from '@/lib/utils';
 
 const STATUS_COLORS: Record<string, string> = {
-  pending:          'bg-yellow-100 text-yellow-700',
-  confirmed:        'bg-blue-100 text-blue-700',
-  processing:       'bg-purple-100 text-purple-700',
-  shipped:          'bg-indigo-100 text-indigo-700',
-  out_for_delivery: 'bg-cyan-100 text-cyan-700',
-  delivered:        'bg-green-100 text-green-700',
-  cancelled:        'bg-red-100 text-red-700',
-  refunded:         'bg-gray-100 text-gray-600',
+  pending:          '#f59e0b',
+  confirmed:        '#3b82f6',
+  processing:       '#8b5cf6',
+  shipped:          '#f97316',
+  out_for_delivery: '#06b6d4',
+  delivered:        '#22c55e',
+  cancelled:        '#ef4444',
+  refunded:         '#6b7280',
 };
+
+const avatarColors = ['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f97316','#22c55e','#14b8a6','#3b82f6'];
 
 export default function AdminCustomerDetailPage() {
   const { user } = useRequireAdmin();
-  const { id }   = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin', 'customer', id],
@@ -37,41 +39,46 @@ export default function AdminCustomerDetailPage() {
 
   if (isLoading) return (
     <div className='min-h-screen flex items-center justify-center'>
-      <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500' />
+      <div className='animate-spin rounded-full h-8 w-8 border-b-2' style={{ borderColor: '#6366f1' }} />
     </div>
   );
 
-  if (!data) return <div className='p-8 text-center text-gray-400'>Customer not found</div>;
+  if (!data) return (
+    <div className='p-12 text-center text-sm' style={{ color: 'var(--tx3)' }}>Customer not found</div>
+  );
 
   const { user: customer, orders, totalSpent } = data;
+  const hash = customer.name ? customer.name.split('').reduce((h: number, c: string) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0) : 0;
+  const avatarColor = avatarColors[Math.abs(hash) % avatarColors.length];
 
   return (
     <PageTransition>
-      <div className='max-w-5xl mx-auto px-4 py-8'>
-
+      <div className='max-w-5xl mx-auto p-6 lg:p-8'>
         {/* Header */}
-        <div className='flex items-center gap-4 mb-8'>
-          <Link href='/admin/customers' className='text-gray-400 hover:text-gray-600'>
-            <ArrowLeft size={20} />
+        <div className='flex items-center gap-4 mb-6'>
+          <Link href='/admin/customers' className='transition-all' style={{ color: 'var(--tx3)' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#6366f1'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--tx3)'; }}>
+            <ArrowLeft size={18} />
           </Link>
           <div className='flex items-center gap-4'>
-            <div className='w-14 h-14 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-xl'>
+            <div className='w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white shrink-0'
+              style={{ background: avatarColor }}>
               {customer.name?.charAt(0).toUpperCase()}
             </div>
             <div>
               <div className='flex items-center gap-2'>
-                <h1 className='text-2xl font-bold text-gray-900'>{customer.name}</h1>
+                <h1 className='text-xl font-bold' style={{ color: 'var(--tx)' }}>{customer.name}</h1>
                 {customer.isVerified
-                  ? <CheckCircle size={18} className='text-green-500' />
-                  : <XCircle size={18} className='text-gray-300' />}
+                  ? <CheckCircle size={16} style={{ color: '#22c55e' }} strokeWidth={1.5} />
+                  : <XCircle size={16} style={{ color: 'var(--tx3)' }} strokeWidth={1.5} />}
               </div>
-              <p className='text-gray-500 text-sm'>{customer.email}</p>
+              <p className='text-sm' style={{ color: 'var(--tx2)' }}>{customer.email}</p>
             </div>
           </div>
         </div>
 
         <div className='grid lg:grid-cols-3 gap-6'>
-
           {/* Left — orders */}
           <div className='lg:col-span-2 space-y-6'>
 
@@ -79,69 +86,78 @@ export default function AdminCustomerDetailPage() {
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
               className='grid grid-cols-3 gap-4'>
               {[
-                { label: 'Total Orders', value: orders.length, icon: ShoppingBag, color: 'text-purple-500 bg-purple-50' },
-                { label: 'Total Spent',  value: formatPrice(totalSpent), icon: null, color: 'text-green-500 bg-green-50' },
-                { label: 'Member Since', value: new Date(customer.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }), icon: Calendar, color: 'text-blue-500 bg-blue-50' },
+                { label: 'Total Orders', value: orders.length },
+                { label: 'Total Spent', value: formatPrice(totalSpent) },
+                { label: 'Member Since', value: new Date(customer.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) },
               ].map(stat => (
-                <div key={stat.label} className='bg-white border border-gray-100 rounded-2xl shadow-sm p-4 text-center'>
-                  <p className='text-xl font-bold text-gray-900'>{stat.value}</p>
-                  <p className='text-xs text-gray-400 mt-1'>{stat.label}</p>
+                <div key={stat.label} className='rounded-xl p-4 text-center'
+                  style={{ background: 'var(--card)', border: '1px solid var(--card-bdr)' }}>
+                  <p className='text-lg font-bold' style={{ color: 'var(--tx)' }}>{stat.value}</p>
+                  <p className='text-xs mt-0.5' style={{ color: 'var(--tx3)' }}>{stat.label}</p>
                 </div>
               ))}
             </motion.div>
 
             {/* Orders */}
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-              className='bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden'>
-              <div className='flex items-center gap-3 p-5 border-b border-gray-100'>
-                <ShoppingBag size={18} className='text-gray-400' />
-                <h2 className='font-semibold text-gray-900'>Order History</h2>
+              className='rounded-xl overflow-hidden' style={{ background: 'var(--card)', border: '1px solid var(--card-bdr)' }}>
+              <div className='flex items-center gap-3 px-5 py-3.5 text-sm font-semibold'
+                style={{ color: 'var(--tx)', borderBottom: '1px solid var(--card-bdr)', background: 'var(--surface)' }}>
+                <ShoppingBag size={16} strokeWidth={1.5} style={{ color: 'var(--tx3)' }} />
+                Order History
               </div>
               {orders.length === 0 ? (
-                <div className='p-8 text-center text-gray-400 text-sm'>No orders yet</div>
+                <div className='p-8 text-center text-sm' style={{ color: 'var(--tx3)' }}>No orders yet</div>
               ) : (
-                <div className='divide-y divide-gray-50'>
-                  {orders.map((order: any) => (
-                    <div key={order._id} className='flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors'>
-                      <div className='flex-1'>
-                        <div className='flex items-center gap-2'>
-                          <p className='font-mono text-xs font-medium text-gray-900'>
-                            #{order._id.slice(-8).toUpperCase()}
+                <div className='divide-y' style={{ borderColor: 'var(--card-bdr)' }}>
+                  {orders.map((order: any) => {
+                    const oColor = STATUS_COLORS[order.status] || '#6b7280';
+                    return (
+                      <div key={order._id} className='flex items-center gap-4 px-5 py-3.5 transition-colors'
+                        style={{ background: 'transparent' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}>
+                        <div className='flex-1'>
+                          <div className='flex items-center gap-2'>
+                            <p className='font-mono text-xs font-medium' style={{ color: 'var(--tx)' }}>
+                              #{order._id.slice(-8).toUpperCase()}
+                            </p>
+                            <span className='text-[10px] px-2 py-0.5 rounded font-medium capitalize'
+                              style={{ background: `${oColor}12`, color: oColor }}>
+                              {order.status.replace('_', ' ')}
+                            </span>
+                          </div>
+                          <p className='text-xs mt-0.5' style={{ color: 'var(--tx3)' }}>
+                            {new Date(order.createdAt).toLocaleDateString('en-US', { dateStyle: 'medium' })} · {order.items?.length} item{order.items?.length !== 1 ? 's' : ''}
                           </p>
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${STATUS_COLORS[order.status] ?? 'bg-gray-100 text-gray-500'}`}>
-                            {order.status.replace('_', ' ')}
-                          </span>
                         </div>
-                        <p className='text-xs text-gray-400 mt-0.5'>
-                          {new Date(order.createdAt).toLocaleDateString('en-US', { dateStyle: 'medium' })} · {order.items?.length} item{order.items?.length !== 1 ? 's' : ''}
-                        </p>
+                        <p className='text-sm font-semibold' style={{ color: 'var(--tx)' }}>{formatPrice(order.total)}</p>
+                        <Link href={`/admin/orders/${order._id}`}
+                          className='text-xs font-medium transition-colors' style={{ color: '#6366f1' }}>
+                          View
+                        </Link>
                       </div>
-                      <p className='font-semibold text-gray-900 text-sm'>{formatPrice(order.total)}</p>
-                      <Link href={`/admin/orders/${order._id}`}
-                        className='text-xs text-brand-500 hover:underline font-medium'>
-                        View
-                      </Link>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </motion.div>
           </div>
 
           {/* Right — profile info */}
-          <div className='space-y-6'>
+          <div className='space-y-5'>
 
             {/* Contact */}
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-              className='bg-white border border-gray-100 rounded-2xl shadow-sm p-5'>
-              <h2 className='font-semibold text-gray-900 mb-4'>Contact</h2>
+              className='rounded-xl p-5' style={{ background: 'var(--card)', border: '1px solid var(--card-bdr)' }}>
+              <h2 className='text-sm font-semibold mb-4' style={{ color: 'var(--tx)' }}>Contact</h2>
               <div className='space-y-3'>
-                <div className='flex items-center gap-3 text-sm text-gray-600'>
-                  <Mail size={15} className='text-gray-400 shrink-0' />
+                <div className='flex items-center gap-3 text-sm' style={{ color: 'var(--tx2)' }}>
+                  <Mail size={15} style={{ color: 'var(--tx3)' }} strokeWidth={1.5} />
                   <span className='truncate'>{customer.email}</span>
                 </div>
-                <div className='flex items-center gap-3 text-sm text-gray-600'>
-                  <Calendar size={15} className='text-gray-400 shrink-0' />
+                <div className='flex items-center gap-3 text-sm' style={{ color: 'var(--tx2)' }}>
+                  <Calendar size={15} style={{ color: 'var(--tx3)' }} strokeWidth={1.5} />
                   <span>Joined {new Date(customer.createdAt).toLocaleDateString('en-US', { dateStyle: 'long' })}</span>
                 </div>
               </div>
@@ -150,19 +166,21 @@ export default function AdminCustomerDetailPage() {
             {/* Addresses */}
             {customer.addresses?.length > 0 && (
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                className='bg-white border border-gray-100 rounded-2xl shadow-sm p-5'>
+                className='rounded-xl p-5' style={{ background: 'var(--card)', border: '1px solid var(--card-bdr)' }}>
                 <div className='flex items-center gap-3 mb-4'>
-                  <MapPin size={18} className='text-gray-400' />
-                  <h2 className='font-semibold text-gray-900'>Addresses</h2>
+                  <MapPin size={16} strokeWidth={1.5} style={{ color: 'var(--tx3)' }} />
+                  <h2 className='text-sm font-semibold' style={{ color: 'var(--tx)' }}>Addresses</h2>
                 </div>
                 <div className='space-y-3'>
                   {customer.addresses.map((addr: any, i: number) => (
-                    <div key={i} className='text-sm text-gray-600 border border-gray-100 rounded-xl p-3'>
-                      {addr.label && <p className='font-medium text-gray-900 mb-1'>{addr.label}</p>}
+                    <div key={i} className='text-sm rounded-xl p-3' style={{ color: 'var(--tx2)', border: '1px solid var(--card-bdr)' }}>
+                      {addr.label && <p className='font-medium mb-1' style={{ color: 'var(--tx)' }}>{addr.label}</p>}
                       <p>{addr.line1}</p>
                       <p>{addr.city}, {addr.state} {addr.zip}</p>
                       <p>{addr.country}</p>
-                      {addr.isDefault && <span className='text-xs text-brand-500 font-medium mt-1 inline-block'>Default</span>}
+                      {addr.isDefault && (
+                        <span className='text-[10px] font-medium mt-1 inline-block' style={{ color: '#6366f1' }}>Default</span>
+                      )}
                     </div>
                   ))}
                 </div>

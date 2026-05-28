@@ -159,18 +159,6 @@ useEffect(() => {
           --auth-muted: #9999aa;
           --auth-border: #e0e0ec;
         }
-        .dark {
-          --auth-bg: #08080e;
-          --auth-brand-bg: #0c0c16;
-          --auth-form-bg: #08080e;
-          --auth-grid: rgba(129,140,248,0.04);
-          --auth-orb: #818cf8;
-          --auth-accent: #818cf8;
-          --auth-accent-hover: #6366f1;
-          --auth-text: #e8e8f0;
-          --auth-muted: #6b6b8a;
-          --auth-border: #1e1e30;
-        }
       `}</style>
     </PageTransition>
   );

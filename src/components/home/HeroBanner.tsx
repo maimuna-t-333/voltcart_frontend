@@ -165,7 +165,7 @@ export default function HeroBanner() {
             transition={{ duration: 0.5, delay: 0.36 }}
           >
             <Link
-              href='/products/macbook-air-m3'
+              href='/products/apple-macbook-air-m3'
               className='inline-flex items-center gap-2 text-[14px] font-semibold text-white px-6 py-3 rounded-xl no-underline transition-all duration-200 hover:-translate-y-0.5'
               style={{
                 background: 'var(--accent)',

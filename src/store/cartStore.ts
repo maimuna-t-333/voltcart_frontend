@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface CartItem { productId:string; variantSku:string; name:string; image:string; price:number; quantity:number; }
+interface CartItem { productId:string; variantSku:string; name:string; image:string; price:number; quantity:number; slug?:string; variantColor?:string; variantStorage?:string; }
 interface CartStore {
   items: CartItem[]; couponCode:string|null; discount:number;
   addItem:(item:CartItem)=>void; removeItem:(sku:string)=>void;

@@ -238,7 +238,7 @@ export default function ProductForm({ mode, productId, initial }: ProductFormPro
                   </button>
                 )}
               </div>
-              <div className='grid grid-cols-3 gap-3'>
+              <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
                 <Field label='SKU *'>
                   <input className={inputCls} value={v.sku} onChange={e => setVariant(i, 'sku', e.target.value)} placeholder='e.g. IPH15P-BLK-128' />
                 </Field>

@@ -42,7 +42,6 @@ export default function CartDrawer() {
     <AnimatePresence>
       {isCartOpen && (
         <>
-          {/* backdrop */}
           <motion.div
             className='fixed inset-0 z-50'
             initial={{ opacity: 0 }}
@@ -50,365 +49,543 @@ export default function CartDrawer() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.22 }}
             onClick={closeCart}
-            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}
+            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)' }}
           />
 
-          {/* modal container */}
-          <div className='fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none'>
+          <div className='fixed inset-0 z-50 flex items-center justify-center pointer-events-none p-4'>
             <motion.div
-              className='cm relative w-full max-w-[480px] max-h-[88vh] rounded-2xl shadow-2xl flex flex-col pointer-events-auto overflow-hidden'
-              initial={{ opacity: 0, scale: 0.93, y: 20 }}
-              animate={{ opacity: 1, scale: 1,    y: 0  }}
-              exit={{    opacity: 0, scale: 0.93, y: 20 }}
-              transition={{ type: 'spring', damping: 26, stiffness: 300 }}
+              className='cd-root pointer-events-auto flex flex-col'
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 320 }}
               onClick={e => e.stopPropagation()}
             >
-
               {/* ── HEADER ── */}
-              <div className='flex items-center justify-between px-6 py-4 cm-border-b shrink-0'>
+              <div className='cd-header flex items-center justify-between shrink-0'>
                 <div className='flex items-center gap-3'>
-                  <div className='relative w-9 h-9 rounded-xl flex items-center justify-center cm-accent-bg'>
-                    <ShoppingCart size={16} strokeWidth={2.5} className='cm-accent' />
+                  <div className='relative w-10 h-10 rounded-xl flex items-center justify-center cd-icon-wrap'>
+                    <ShoppingCart size={17} strokeWidth={2} className='cd-accent' />
                     {itemCount > 0 && (
                       <motion.span
                         key={itemCount}
-                        initial={{ scale: 0.5 }}
+                        initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className='absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full text-[10px] font-bold text-white flex items-center justify-center cm-badge'
-                      >
-                        {itemCount}
-                      </motion.span>
+                        className='cd-badge-dot'
+                      />
                     )}
                   </div>
                   <div>
-                    <h2 className='font-bold text-[15px] cm-text leading-none'>Your Cart</h2>
-                    <p className='text-[11px] cm-muted mt-0.5'>
-                      {itemCount === 0 ? 'Empty' : `${itemCount} item${itemCount !== 1 ? 's' : ''}`}
+                    <h2 className='cd-title'>Cart</h2>
+                    <p className='cd-subtitle'>
+                      {itemCount === 0 ? 'No items yet' : `${itemCount} item${itemCount !== 1 ? 's' : ''}`}
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={closeCart}
-                  aria-label='Close cart'
-                  className='cm-close flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200'
-                >
-                  <X size={16} strokeWidth={2.5} />
+                <button onClick={closeCart} aria-label='Close' className='cd-close-btn'>
+                  <X size={16} strokeWidth={2} />
                 </button>
               </div>
 
-              {/* ── FREE SHIPPING BAR ── */}
+              {/* ── FREE SHIPPING ── */}
               {items.length > 0 && (
-                <div className='px-6 py-3 cm-shipping-bg shrink-0'>
-                  <div className='flex items-center justify-between mb-1.5'>
-                    <div className='flex items-center gap-1.5'>
-                      <Truck size={12} strokeWidth={2.5} className={freeShipping ? 'text-green-500' : 'cm-muted'} />
-                      <span className='text-[11.5px] font-medium cm-muted'>
-                        {freeShipping
-                          ? <span className='text-green-500 font-semibold'>You've unlocked free shipping!</span>
-                          : <><span className='cm-text font-semibold'>${remaining.toFixed(2)}</span> away from free shipping</>
-                        }
-                      </span>
-                    </div>
-                    <span className='text-[10px] font-semibold cm-muted'>${FREE_SHIPPING_THRESHOLD}</span>
+                <div className='cd-ship shrink-0'>
+                  <div className='flex items-center gap-2 mb-1.5'>
+                    <Truck size={13} strokeWidth={1.5} className={freeShipping ? 'cd-ship-done' : 'cd-ship-muted'} />
+                    <span className='cd-ship-text'>
+                      {freeShipping
+                        ? <span className='cd-ship-done font-semibold'>Free shipping unlocked!</span>
+                        : <>Add <span className='font-semibold' style={{ color: 'var(--tx)' }}>${remaining.toFixed(2)}</span> for free shipping</>
+                      }
+                    </span>
                   </div>
-                  <div className='h-1.5 rounded-full cm-progress-track overflow-hidden'>
+                  <div className='cd-progress-track'>
                     <motion.div
-                      className='h-full rounded-full cm-progress-fill'
+                      className='cd-progress-fill'
                       initial={{ width: 0 }}
                       animate={{ width: `${shippingProgress}%` }}
-                      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                     />
                   </div>
                 </div>
               )}
 
               {/* ── BODY ── */}
-              <div className='flex-1 overflow-y-auto cm-scroll px-6 py-4'>
+              <div className='flex-1 overflow-y-auto cd-scroll px-4 py-4 space-y-2.5'>
                 {items.length === 0 ? (
                   <motion.div
-                    initial={{ opacity: 0, y: 12 }}
+                    initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35 }}
-                    className='flex flex-col items-center justify-center py-16 text-center'
+                    className='flex flex-col items-center justify-center h-full text-center px-4'
                   >
-                    <motion.div
-                      animate={{ y: [0, -6, 0] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                      className='w-20 h-20 rounded-2xl flex items-center justify-center mb-5 cm-accent-bg'
-                    >
-                      <ShoppingBag size={32} strokeWidth={1.5} className='cm-accent' />
-                    </motion.div>
-                    <p className='text-[15px] font-bold cm-text mb-1.5'>Your cart is empty</p>
-                    <p className='text-[12.5px] cm-muted mb-6 max-w-[200px] leading-relaxed'>
-                      Discover the latest gadgets and add them here
-                    </p>
-                    <Link
-                      href='/products'
-                      onClick={closeCart}
-                      className='cm-cta inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-all duration-200'
-                    >
-                      <Zap size={13} strokeWidth={2.5} />
+                    <div className='cd-empty-icon-wrap mb-5'>
+                      <ShoppingBag size={28} strokeWidth={1.2} className='cd-accent' />
+                    </div>
+                    <p className='cd-empty-title'>Nothing here yet</p>
+                    <p className='cd-empty-desc'>Explore our latest gadgets and add your favorites</p>
+                    <Link href='/products' onClick={closeCart} className='cd-empty-cta'>
+                      <Zap size={14} strokeWidth={2} />
                       Browse Products
                     </Link>
                   </motion.div>
                 ) : (
-                  <div className='space-y-3'>
-                    <AnimatePresence mode='popLayout'>
-                      {items.map((item, idx) => (
-                        <motion.div
-                          key={item.variantSku}
-                          layout
-                          initial={{ opacity: 0, y: 16, scale: 0.96 }}
-                          animate={{ opacity: 1, y: 0,  scale: 1    }}
-                          exit={{    opacity: 0, x: 80, scale: 0.94 }}
-                          transition={{ duration: 0.25, delay: idx * 0.07 }}
-                          className='cm-item flex gap-4 p-3.5 rounded-xl'
-                        >
-                          {/* image */}
-                          <div className='relative w-[72px] h-[72px] rounded-xl overflow-hidden shrink-0 cm-img-bg'>
-                            {item.image ? (
-                              <>
-                                <Image src={item.image} alt={item.name} fill sizes='72px' className='object-cover' unoptimized />
-                                <div className='absolute inset-0 cm-img-overlay' />
-                              </>
-                            ) : (
-                              <div className='flex items-center justify-center w-full h-full'>
-                                <Package size={24} strokeWidth={1.5} className='cm-muted' />
-                              </div>
-                            )}
-                          </div>
-
-                          {/* info */}
-                          <div className='flex-1 min-w-0'>
-                            <p className='text-[13px] font-semibold cm-text leading-snug line-clamp-2'>
-                              {item.name}
-                            </p>
-                            <div className='flex items-baseline gap-2 mt-1'>
-                              <span className='text-[15px] font-bold cm-accent'>
-                                ${(item.price * item.quantity).toFixed(2)}
-                              </span>
-                              {item.quantity > 1 && (
-                                <span className='text-[11px] cm-muted'>
-                                  ${item.price.toFixed(2)} ea.
-                                </span>
-                              )}
+                  <AnimatePresence mode='popLayout'>
+                    {items.map((item) => (
+                      <motion.div
+                        key={item.variantSku}
+                        layout
+                        initial={{ opacity: 0, y: 20, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, x: 80, scale: 0.95 }}
+                        transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+                        className='cd-item'
+                      >
+                        <div className='cd-item-img'>
+                          {item.image ? (
+                            <Image src={item.image} alt={item.name} fill sizes='80px' className='object-cover' unoptimized />
+                          ) : (
+                            <Package size={22} strokeWidth={1.2} className='cd-item-img-fallback' />
+                          )}
+                        </div>
+                        <div className='flex-1 min-w-0'>
+                          <p className='cd-item-name'>{item.name}</p>
+                          <p className='cd-item-price'>${item.price.toFixed(2)}</p>
+                          <div className='flex items-center gap-2 mt-2'>
+                            <div className='cd-qty'>
+                              <button onClick={() => item.quantity > 1 ? updateQty(item.variantSku, item.quantity - 1) : removeItem(item.variantSku)} className='cd-qty-btn' aria-label='Decrease'>
+                                <Minus size={10} strokeWidth={2.5} />
+                              </button>
+                              <span className='cd-qty-val'>{item.quantity}</span>
+                              <button onClick={() => updateQty(item.variantSku, item.quantity + 1)} className='cd-qty-btn' aria-label='Increase'>
+                                <Plus size={10} strokeWidth={2.5} />
+                              </button>
                             </div>
-
-                            {/* qty row */}
-                            <div className='flex items-center gap-2 mt-2.5'>
-                              <div className='flex items-center cm-qty-wrap rounded-lg overflow-hidden'>
-                                <button
-                                  onClick={() => item.quantity > 1
-                                    ? updateQty(item.variantSku, item.quantity - 1)
-                                    : removeItem(item.variantSku)}
-                                  className='cm-qty-btn flex items-center justify-center w-7 h-7 transition-all duration-150'
-                                  aria-label='Decrease'
-                                >
-                                  <Minus size={11} strokeWidth={2.5} />
-                                </button>
-                                <span className='text-[13px] font-bold cm-text w-7 text-center tabular-nums'>
-                                  {item.quantity}
-                                </span>
-                                <button
-                                  onClick={() => updateQty(item.variantSku, item.quantity + 1)}
-                                  className='cm-qty-btn flex items-center justify-center w-7 h-7 transition-all duration-150'
-                                  aria-label='Increase'
-                                >
-                                  <Plus size={11} strokeWidth={2.5} />
-                                </button>
-                              </div>
-                            </div>
+                            <span className='cd-item-line'>${(item.price * item.quantity).toFixed(2)}</span>
                           </div>
-
-                          {/* remove */}
-                          <button
-                            onClick={() => removeItem(item.variantSku)}
-                            className='cm-remove flex items-center justify-center w-7 h-7 rounded-lg self-start shrink-0 transition-all duration-150'
-                            aria-label='Remove'
-                          >
-                            <Trash2 size={13} strokeWidth={2} />
-                          </button>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                  </div>
+                        </div>
+                        <button onClick={() => removeItem(item.variantSku)} className='cd-item-remove' aria-label='Remove'>
+                          <Trash2 size={13} strokeWidth={1.5} />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
                 )}
               </div>
 
               {/* ── FOOTER ── */}
               {items.length > 0 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ y: 12, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.1 }}
-                  className='shrink-0 px-6 pt-4 pb-5 cm-border-t'
+                  className='cd-footer shrink-0'
                 >
-                  {/* coupon */}
                   {couponCode && discount > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className='flex items-center justify-between mb-3 px-3 py-2 rounded-xl cm-coupon'
-                    >
-                      <div className='flex items-center gap-2'>
-                        <Tag size={12} strokeWidth={2.5} className='cm-accent' />
-                        <span className='text-[12px] font-semibold cm-accent'>{couponCode}</span>
-                      </div>
-                      <span className='text-[12px] font-bold text-green-500'>−${discount.toFixed(2)}</span>
-                    </motion.div>
+                    <div className='cd-coupon'>
+                      <Tag size={12} strokeWidth={2} className='cd-accent' />
+                      <span className='cd-coupon-code'>{couponCode}</span>
+                      <span className='cd-coupon-val'>−${discount.toFixed(2)}</span>
+                    </div>
                   )}
 
-                  {/* order summary */}
-                  <div className='cm-summary rounded-xl p-4 mb-4 space-y-2'>
-                    <div className='flex justify-between text-[12.5px]'>
-                      <span className='cm-muted'>Subtotal ({itemCount} item{itemCount !== 1 ? 's' : ''})</span>
-                      <span className='cm-text font-semibold'>${subtotal.toFixed(2)}</span>
+                  <div className='cd-summary'>
+                    <div className='cd-summary-row'>
+                      <span>Subtotal</span>
+                      <span className='font-semibold'>${subtotal.toFixed(2)}</span>
                     </div>
                     {discount > 0 && (
-                      <div className='flex justify-between text-[12.5px]'>
-                        <span className='cm-muted'>Discount</span>
-                        <span className='text-green-500 font-semibold'>−${discount.toFixed(2)}</span>
+                      <div className='cd-summary-row' style={{ color: '#22c55e' }}>
+                        <span>Discount</span>
+                        <span className='font-semibold'>−${discount.toFixed(2)}</span>
                       </div>
                     )}
-                    <div className='flex justify-between text-[12.5px]'>
-                      <span className='cm-muted'>Shipping</span>
-                      <span className={freeShipping ? 'text-green-500 font-semibold' : 'cm-muted'}>
-                        {freeShipping ? 'Free' : 'Calculated at checkout'}
+                    <div className='cd-summary-row'>
+                      <span>Shipping</span>
+                      <span className={freeShipping ? 'text-green-500 font-semibold' : ''}>
+                        {freeShipping ? 'Free' : 'TBD'}
                       </span>
-                    </div>
-                    <div className='pt-2 mt-1 cm-summary-divider flex justify-between items-baseline'>
-                      <span className='text-[14px] font-bold cm-text'>Total</span>
-                      <motion.span
-                        key={total}
-                        initial={{ scale: 1.08 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.3 }}
-                        className='text-[22px] font-bold cm-text tabular-nums'
-                      >
-                        ${total.toFixed(2)}
-                      </motion.span>
                     </div>
                   </div>
 
-                  {/* checkout */}
-                  <Link
-                    href='/checkout'
-                    onClick={closeCart}
-                    className='cm-cta cm-cta-shimmer relative flex items-center justify-center gap-2 w-full py-4 rounded-xl text-[14px] font-bold text-white overflow-hidden transition-all duration-200 active:scale-[0.98]'
-                  >
-                    <span className='relative z-10 flex items-center gap-2'>
-                      Proceed to Checkout
-                      <ArrowRight size={16} strokeWidth={2.5} />
-                    </span>
+                  <div className='cd-total'>
+                    <span>Total</span>
+                    <motion.span
+                      key={total}
+                      initial={{ scale: 1.06 }}
+                      animate={{ scale: 1 }}
+                      className='cd-total-val'
+                    >
+                      ${total.toFixed(2)}
+                    </motion.span>
+                  </div>
+
+                  <Link href='/checkout' onClick={closeCart} className='cd-checkout-btn'>
+                    <span>Checkout</span>
+                    <ArrowRight size={15} strokeWidth={2.5} />
                   </Link>
 
-                  {/* secondary actions */}
-                  <div className='flex items-center justify-between mt-3'>
-                    <button
-                      onClick={closeCart}
-                      className='flex items-center gap-1 text-[12px] font-medium cm-muted hover:cm-text transition-colors duration-200'
-                    >
-                      <ChevronRight size={12} style={{ transform: 'rotate(180deg)' }} strokeWidth={2.5} />
-                      Continue shopping
+                  <div className='cd-footer-links'>
+                    <button onClick={closeCart} className='cd-footer-link'>
+                      <ChevronRight size={12} strokeWidth={2} style={{ transform: 'rotate(180deg)' }} />
+                      Keep shopping
                     </button>
-                    <Link
-                      href='/cart'
-                      onClick={closeCart}
-                      className='text-[12px] font-medium cm-accent-text hover:underline transition-colors duration-200'
-                    >
+                    <Link href='/cart' onClick={closeCart} className='cd-footer-link cd-footer-link-accent'>
                       View full cart
                     </Link>
                   </div>
                 </motion.div>
               )}
-
             </motion.div>
           </div>
 
           <style>{`
-            .cm {
+            .cd-root {
+              width: 100%;
+              max-width: 460px;
+              max-height: 90vh;
+              border-radius: 20px;
               background: var(--card);
               border: 1px solid var(--card-bdr);
+              box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+              overflow: hidden;
             }
-            .cm-border-b { border-bottom: 1px solid var(--border); }
-            .cm-border-t { border-top:    1px solid var(--border); }
-            .cm-text      { color: var(--tx); }
-            .cm-muted     { color: var(--tx2); }
-            .cm-accent    { color: var(--accent); }
-            .cm-accent-text { color: var(--accent); }
-            .cm-accent-bg { background: var(--accent-dim); }
-            .cm-badge     { background: var(--accent); }
 
-            .cm-shipping-bg { background: var(--surface); border-bottom: 1px solid var(--border); }
-            .cm-progress-track { background: var(--border); }
-            .cm-progress-fill  { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
-
-            .cm-item {
+            .cd-header {
+              padding: 20px 20px 16px;
+              border-bottom: 1px solid var(--card-bdr);
+            }
+            .cd-icon-wrap {
+              background: var(--accent-dim);
+            }
+            .cd-badge-dot {
+              position: absolute;
+              top: -2px;
+              right: -2px;
+              width: 9px;
+              height: 9px;
+              border-radius: 999px;
+              background: var(--accent);
+              border: 2px solid var(--card);
+            }
+            .cd-title {
+              font-size: 16px;
+              font-weight: 700;
+              color: var(--tx);
+              line-height: 1.2;
+            }
+            .cd-subtitle {
+              font-size: 12px;
+              color: var(--tx2);
+              margin-top: 1px;
+            }
+            .cd-close-btn {
+              width: 34px;
+              height: 34px;
+              border-radius: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: var(--tx2);
+              transition: background 0.15s, color 0.15s;
+              cursor: pointer;
+              background: none;
+              border: none;
+            }
+            .cd-close-btn:hover {
               background: var(--surface);
-              border: 1px solid var(--border);
+              color: var(--tx);
+            }
+
+            .cd-ship {
+              padding: 12px 20px 14px;
+              background: var(--surface);
+              border-bottom: 1px solid var(--card-bdr);
+            }
+            .cd-ship-muted { color: var(--tx3); }
+            .cd-ship-done { color: #22c55e; }
+            .cd-ship-text { font-size: 12px; color: var(--tx2); }
+            .cd-progress-track {
+              height: 4px;
+              border-radius: 4px;
+              background: var(--card-bdr);
+              overflow: hidden;
+            }
+            .cd-progress-fill {
+              height: 100%;
+              border-radius: 4px;
+              background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            }
+
+            .cd-scroll::-webkit-scrollbar { width: 3px; }
+            .cd-scroll::-webkit-scrollbar-track { background: transparent; }
+            .cd-scroll::-webkit-scrollbar-thumb { background: var(--card-bdr); border-radius: 4px; }
+
+            .cd-empty-icon-wrap {
+              width: 72px;
+              height: 72px;
+              border-radius: 18px;
+              background: var(--accent-dim);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .cd-empty-title {
+              font-size: 16px;
+              font-weight: 700;
+              color: var(--tx);
+            }
+            .cd-empty-desc {
+              font-size: 13px;
+              color: var(--tx2);
+              margin-top: 4px;
+              max-width: 220px;
+              line-height: 1.5;
+            }
+            .cd-empty-cta {
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+              margin-top: 20px;
+              padding: 10px 22px;
+              border-radius: 12px;
+              font-size: 13px;
+              font-weight: 600;
+              color: #fff;
+              background: linear-gradient(135deg, #6366f1, #8b5cf6);
+              box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+              transition: box-shadow 0.2s, transform 0.15s;
+              text-decoration: none;
+            }
+            .cd-empty-cta:hover {
+              box-shadow: 0 6px 24px rgba(99,102,241,0.45);
+            }
+
+            .cd-item {
+              display: flex;
+              gap: 12px;
+              padding: 12px;
+              border-radius: 14px;
+              background: var(--surface);
+              border: 1px solid var(--card-bdr);
               transition: border-color 0.2s, box-shadow 0.2s;
             }
-            .cm-item:hover {
+            .cd-item:hover {
               border-color: var(--border-hi);
-              box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+              box-shadow: 0 2px 12px rgba(99,102,241,0.06);
             }
-
-            .cm-img-bg { background: var(--accent-dim); }
-            .cm-img-overlay {
-              background: linear-gradient(to top, rgba(0,0,0,0.15) 0%, transparent 50%);
+            .cd-item-img {
+              position: relative;
+              width: 76px;
+              height: 76px;
+              border-radius: 12px;
+              overflow: hidden;
+              background: var(--accent-dim);
+              flex-shrink: 0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
             }
-
-            .cm-qty-wrap {
-              border: 1px solid var(--border);
-              background: var(--surface);
+            .cd-item-img-fallback {
+              color: var(--tx3);
             }
-            .cm-qty-btn { color: var(--tx2); }
-            .cm-qty-btn:hover {
+            .cd-item-name {
+              font-size: 13px;
+              font-weight: 600;
+              color: var(--tx);
+              line-height: 1.3;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+            }
+            .cd-item-price {
+              font-size: 12px;
+              color: var(--tx3);
+              margin-top: 1px;
+            }
+            .cd-qty {
+              display: flex;
+              align-items: center;
+              gap: 0;
+              border: 1px solid var(--card-bdr);
+              border-radius: 8px;
+              overflow: hidden;
+              background: var(--card);
+            }
+            .cd-qty-btn {
+              width: 26px;
+              height: 26px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: var(--tx2);
+              transition: background 0.12s, color 0.12s;
+              cursor: pointer;
+              background: none;
+              border: none;
+              font-size: 0;
+            }
+            .cd-qty-btn:hover {
               background: var(--accent-dim);
               color: var(--accent);
             }
-
-            .cm-remove { color: var(--tx3); }
-            .cm-remove:hover {
+            .cd-qty-val {
+              width: 24px;
+              text-align: center;
+              font-size: 12px;
+              font-weight: 700;
+              color: var(--tx);
+            }
+            .cd-item-line {
+              font-size: 13px;
+              font-weight: 700;
+              color: var(--accent);
+              margin-left: auto;
+            }
+            .cd-item-remove {
+              width: 28px;
+              height: 28px;
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: var(--tx3);
+              transition: background 0.12s, color 0.12s;
+              cursor: pointer;
+              background: none;
+              border: none;
+              flex-shrink: 0;
+              align-self: flex-start;
+            }
+            .cd-item-remove:hover {
               background: rgba(239,68,68,0.1);
               color: #ef4444;
             }
 
-            .cm-close { color: var(--tx2); }
-            .cm-close:hover { background: var(--surface); color: var(--tx); }
-
-            .cm-coupon { background: var(--accent-dim); border: 1px solid rgba(99,102,241,0.15); }
-
-            .cm-summary {
-              background: var(--surface);
-              border: 1px solid var(--border);
+            .cd-footer {
+              padding: 16px 20px 20px;
+              border-top: 1px solid var(--card-bdr);
+              background: var(--card);
             }
-            .cm-summary-divider { border-top: 1px solid var(--border); }
-
-            .cm-cta {
+            .cd-coupon {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 10px 14px;
+              border-radius: 10px;
+              background: var(--accent-dim);
+              border: 1px solid rgba(99,102,241,0.12);
+              margin-bottom: 12px;
+            }
+            .cd-coupon-code {
+              font-size: 12px;
+              font-weight: 700;
+              color: var(--accent);
+              flex: 1;
+            }
+            .cd-coupon-val {
+              font-size: 12px;
+              font-weight: 700;
+              color: #22c55e;
+            }
+            .cd-summary {
+              display: flex;
+              flex-direction: column;
+              gap: 6px;
+              margin-bottom: 12px;
+            }
+            .cd-summary-row {
+              display: flex;
+              justify-content: space-between;
+              font-size: 13px;
+              color: var(--tx2);
+            }
+            .cd-total {
+              display: flex;
+              justify-content: space-between;
+              align-items: baseline;
+              padding-top: 12px;
+              border-top: 1px solid var(--card-bdr);
+              font-size: 14px;
+              font-weight: 700;
+              color: var(--tx);
+              margin-bottom: 16px;
+            }
+            .cd-total-val {
+              font-size: 22px;
+              font-weight: 800;
+              font-family: var(--font-family-display);
+              color: var(--accent);
+            }
+            .cd-checkout-btn {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 10px;
+              width: 100%;
+              padding: 14px;
+              border-radius: 12px;
+              font-size: 14px;
+              font-weight: 700;
+              color: #fff;
               background: linear-gradient(135deg, #6366f1, #4f46e5);
-              box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+              box-shadow: 0 4px 20px rgba(99,102,241,0.35);
+              transition: box-shadow 0.2s, transform 0.15s;
+              text-decoration: none;
+              border: none;
+              cursor: pointer;
+              position: relative;
+              overflow: hidden;
             }
-            .cm-cta:hover {
-              filter: brightness(1.08);
-              box-shadow: 0 6px 28px rgba(99,102,241,0.55);
-            }
-            .cm-cta-shimmer::before {
+            .cd-checkout-btn::before {
               content: '';
               position: absolute;
               inset: 0;
-              background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
+              background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.12) 50%, transparent 60%);
               background-size: 200% 100%;
-              animation: cm-shimmer 2.5s infinite;
+              animation: cd-shimmer 2.8s infinite;
             }
-            @keyframes cm-shimmer {
+            .cd-checkout-btn:hover {
+              box-shadow: 0 6px 28px rgba(99,102,241,0.5);
+            }
+            .cd-checkout-btn:active {
+              transform: scale(0.98);
+            }
+            @keyframes cd-shimmer {
               0%   { background-position: 200% 0; }
               100% { background-position: -200% 0; }
             }
-
-            .cm-scroll::-webkit-scrollbar { width: 4px; }
-            .cm-scroll::-webkit-scrollbar-track { background: transparent; }
-            .cm-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+            .cd-footer-links {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-top: 12px;
+            }
+            .cd-footer-link {
+              display: flex;
+              align-items: center;
+              gap: 4px;
+              font-size: 12px;
+              font-weight: 500;
+              color: var(--tx2);
+              text-decoration: none;
+              transition: color 0.15s;
+              cursor: pointer;
+              background: none;
+              border: none;
+              padding: 0;
+            }
+            .cd-footer-link:hover {
+              color: var(--tx);
+            }
+            .cd-footer-link-accent {
+              color: var(--accent);
+              font-weight: 600;
+            }
+            .cd-footer-link-accent:hover {
+              color: var(--accent);
+              text-decoration: underline;
+            }
           `}</style>
         </>
       )}
