@@ -12,7 +12,7 @@ import { Check, CreditCard, MapPin, Truck, User, ChevronLeft, Shield } from 'luc
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {contactSchema, type ContactFormData, shippingSchema, type ShippingFormData} from '@/lib/validations/checkout.schemas';
+import { contactSchema, type ContactFormData, shippingSchema, type ShippingFormData } from '@/lib/validations/checkout.schemas';
 
 const slideVariants = {
   enter: (d: number) => ({ x: d > 0 ? 260 : -260, opacity: 0 }),
@@ -124,83 +124,86 @@ export default function CheckoutPage() {
   const total = subtotal - discount + (subtotal > 50 ? 0 : shippingCost);
   const prevStep = () => { setDir(-1); setStep(s => Math.max(s - 1, 1)) };
   const user = useAuthStore(s => s.user);
+  const isLoading = useAuthStore(s => s.isLoading);
 
-  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) }, [step]);
+   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }) }, [step]);
 
-  const {register: registerContact,
+  if (!isLoading && !user) { router.replace('/auth/login?redirect=/checkout'); return null; }
+
+  const { register: registerContact,
     handleSubmit: handleContact,
-    formState: { errors: contactErrors }} = useForm<ContactFormData>({
-    resolver: zodResolver(contactSchema),
-    defaultValues: {
-    name:  user?.name  || '',
-    email: user?.email || '',
-    phone: '',
-  },
-  });
+    formState: { errors: contactErrors } } = useForm<ContactFormData>({
+      resolver: zodResolver(contactSchema),
+      defaultValues: {
+        name: user?.name || '',
+        email: user?.email || '',
+        phone: '',
+      },
+    });
 
   const {
-  register: registerShipping,
-  handleSubmit: handleShipping,
-  setValue: setShippingValue,
-  watch: watchShipping,
-  getValues: getShippingValues,
-  formState: { errors: shippingErrors }} = useForm<ShippingFormData>({
-  resolver: zodResolver(shippingSchema),
-  defaultValues: {
-    address: '', city: '', state: '', zip: '', country: 'US',
-  },
-});
+    register: registerShipping,
+    handleSubmit: handleShipping,
+    setValue: setShippingValue,
+    watch: watchShipping,
+    getValues: getShippingValues,
+    formState: { errors: shippingErrors } } = useForm<ShippingFormData>({
+      resolver: zodResolver(shippingSchema),
+      defaultValues: {
+        address: '', city: '', state: '', zip: '', country: 'US',
+      },
+    });
 
-const onContactSubmit = () => {
-  setDir(1);
-  setStep(2);
-};
+  const onContactSubmit = () => {
+    setDir(1);
+    setStep(2);
+  };
 
-const onShippingSubmit = () => {
-  setDir(1);
-  setStep(3);
-};
+  const onShippingSubmit = () => {
+    setDir(1);
+    setStep(3);
+  };
 
-const nextStep = () => { setDir(1); setStep(s => Math.min(s + 1, 4)) };
+  const nextStep = () => { setDir(1); setStep(s => Math.min(s + 1, 4)) };
 
   const handlePayment = async () => {
-  setLoading(true);
-  try {
-    const { data } = await api.post('/payments/intent', {
-      shippingMethod,
-      items: items.map(item => ({
-        productId: item.productId,
-        variantSku: item.variantSku,
-        quantity: item.quantity,
-        price: item.price,
-        name: item.name,
-        image: item.image,
-        slug: item.slug,
-        variantColor: item.variantColor,
-        variantStorage: item.variantStorage,
-      })),
-      subtotal,
-      discount,
-      couponCode,
-      shippingAddress: {
-        line1: getShippingValues('address'),
-        city: getShippingValues('city'),
-        state: getShippingValues('state'),
-        zip: getShippingValues('zip'),
-        country: getShippingValues('country'),
+    setLoading(true);
+    try {
+      const { data } = await api.post('/payments/intent', {
+        shippingMethod,
+        items: items.map(item => ({
+          productId: item.productId,
+          variantSku: item.variantSku,
+          quantity: item.quantity,
+          price: item.price,
+          name: item.name,
+          image: item.image,
+          slug: item.slug,
+          variantColor: item.variantColor,
+          variantStorage: item.variantStorage,
+        })),
+        subtotal,
+        discount,
+        couponCode,
+        shippingAddress: {
+          line1: getShippingValues('address'),
+          city: getShippingValues('city'),
+          state: getShippingValues('state'),
+          zip: getShippingValues('zip'),
+          country: getShippingValues('country'),
+        }
+      });
+      if (data.data.clientSecret) {
+        toast.success('Order placed! Redirecting...');
+        clearCart();
+        router.push(`/order-confirmation?orderId=${data.data.orderId}`);
       }
-    });
-    if (data.data.clientSecret) {
-      toast.success('Order placed! Redirecting...');
-      clearCart();
-      router.push(`/order-confirmation?orderId=${data.data.orderId}`);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Payment failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  } catch (err: any) {
-    toast.error(err.response?.data?.message || 'Payment failed. Please try again.');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   if (items.length === 0) return (
     <PageTransition>
@@ -391,13 +394,13 @@ const nextStep = () => { setDir(1); setStep(s => Math.min(s + 1, 4)) };
                           />
                           {shippingErrors.state && <p className={fieldErrorClass}>{shippingErrors.state.message}</p>}
                         </div>
-                         <div>
-                           <label className={labelClass}>Country</label>
-                           <CountrySelect
-                             value={watchShipping('country') || 'US'}
-                             onChange={v => setShippingValue('country', v)}
-                           />
-                         </div>
+                        <div>
+                          <label className={labelClass}>Country</label>
+                          <CountrySelect
+                            value={watchShipping('country') || 'US'}
+                            onChange={v => setShippingValue('country', v)}
+                          />
+                        </div>
                       </div>
 
                       <div className='flex gap-3 mt-4'>
